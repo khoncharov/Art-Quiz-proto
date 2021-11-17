@@ -11,9 +11,9 @@ class AppSettings {
   constructor() {
     this._options = JSON.parse(localStorage.getItem("options")) ?? {
       soundsEnabled: false,
-      volume: 0.5,
+      volume: 1, // 0 - 1
       timeLimitEnabled: false,
-      timeLimit: 30,
+      timeLimit: 30, // [5 - 30] step 5 seconds
     };
   }
 
@@ -71,28 +71,40 @@ class View {
       <main>
         <h2>Settings</h2>
         <section style="background-color: #ede">
-          <h3>Volume</h3>
-          <label for="vol-off">
-            <span>Turn off volume</span>
-            <input type="checkbox" name="vol-off" id="vol-off" />
+          <h3>Sounds</h3>
+          <label for="sounds-enabled">
+            <span>Enabled</span>
+            <input id="sounds-enabled" type="checkbox" name="vol-off"
+              ${data.soundsEnabled ? "checked" : ""} />
           </label>
           <br />
-          <input type="range" name="volume" min="0" max="100" step="5" />
+          <br />
+          <input id="volume-level" type="range" name="volume" min="0.1" max="1" step="0.1"
+            value="${data.volume}"/>
         </section>
         <section style="background-color: #ede">
-          <h3>Time limit in seconds</h3>
-          <label for="time-off">
-            <span>Turn off time limit</span>
-            <input type="checkbox" name="time-off" id="time-off" />
-          </label>
+          <h3>Time limit for a question</h3>
+          <input type="number" id="time-limit" min="5" max="30" step="5"
+            name="time" value="${data.timeLimit}" /> <span>sec</span>
           <br />
-          <input type="number" name="time" id="time" min="5" max="30" step="5" />
+          <br />
+          <label for="time-limit-enabled">
+            <span>Enabled</span>
+            <input type="checkbox" name="time-off" id="time-limit-enabled"
+              ${data.timeLimitEnabled ? "checked" : ""} />
+          </label>
         </section>
         <br />
-        <button id="cancel-btn">Cancel</button>
-        <button>Save</button>
-        <button>Default</button>
-      </main>`;
+        <button id="home-btn">Home</button>
+        <button id="save-settings-btn">Save</button>
+        <button id="default-settings-btn">Default</button>
+      </main>
+      <audio preload="auto">
+        <source src="/assets/sounds/button-30.mp3" type="audio/mpeg">
+      </audio>
+      <audio preload="auto">
+        <source src="/assets/sounds/button-16.mp3" type="audio/mpeg">
+      </audio>`;
     return content;
   }
 
@@ -142,10 +154,11 @@ class AppController {
     viewPort.appendChild(pageNode);
   }
 
+  // User actions handlers
+  //
   btnHandlerHome = () => {
     // Create page basic layout
-    const pageData = this.settings.options;
-    const pageNode = this.view.createHomePage(pageData);
+    const pageNode = this.view.createHomePage();
     // Add page events
     const btnSettings = pageNode.querySelector("#settings-btn");
     btnSettings.addEventListener("click", this.btnHandlerSettings);
@@ -158,8 +171,7 @@ class AppController {
   };
   btnHandlerArtistsQuiz = () => {
     // Create page basic layout
-    const pageData = this.settings.options;
-    const pageNode = this.view.createGroupsPage(pageData);
+    const pageNode = this.view.createGroupsPage();
     // Add page events
     const btnHome = pageNode.querySelector("#home-page-btn");
     btnHome.addEventListener("click", this.btnHandlerHome);
@@ -168,24 +180,88 @@ class AppController {
   };
   btnHandlerPaintingsQuiz = () => {
     // Create page basic layout
-    const pageData = this.settings.options;
-    const pageNode = this.view.createGroupsPage(pageData);
+    const pageNode = this.view.createGroupsPage();
     // Add page events
     const btnHome = pageNode.querySelector("#home-page-btn");
     btnHome.addEventListener("click", this.btnHandlerHome);
     //
     this.render(pageNode);
   };
+
   btnHandlerSettings = () => {
     // Create page basic layout
     const pageData = this.settings.options;
     const pageNode = this.view.createSettingsPage(pageData);
+    // Update sounds
+    this.mutePage(pageNode, !this.settings.options.soundsEnabled);
+    this.changePageVolume(pageNode, this.settings.options.volume);
+
     // Add page events
-    const btnCancel = pageNode.querySelector("#cancel-btn");
-    btnCancel.addEventListener("click", this.btnHandlerHome);
+    const soundsEnabled = pageNode.querySelector("#sounds-enabled");
+    soundsEnabled.addEventListener("click", (e) => {
+      this.mutePage(document, !e.target.checked);
+      if (e.target.checked) {
+        this.playSound("click");
+      }
+    });
+    const volume = pageNode.querySelector("#volume-level");
+    volume.addEventListener("change", (e) => {
+      this.changePageVolume(document, e.target.value);
+      this.playSound("snap");
+    });
+    const timeLimit = pageNode.querySelector("#time-limit");
+    timeLimit.addEventListener("change", (e) => {
+      if (e.target.value < 5) {
+        e.target.value = 5;
+      } else if (e.target.value > 30 || e.target.value === "") {
+        e.target.value = 30;
+      }
+    });
+    const btnHome = pageNode.querySelector("#home-btn");
+    btnHome.addEventListener("click", this.btnHandlerHome);
+    const btnSave = pageNode.querySelector("#save-settings-btn");
+    btnSave.addEventListener("click", () => {
+      this.settings.options = {
+        soundsEnabled: document.querySelector("#sounds-enabled").checked,
+        volume: document.querySelector("#volume-level").value,
+        timeLimitEnabled: document.querySelector("#time-limit-enabled").checked,
+        timeLimit: document.querySelector("#time-limit").value,
+      };
+    });
+    const btnDefault = pageNode.querySelector("#default-settings-btn");
+    btnDefault.addEventListener("click", () => {
+      document.querySelector("#sounds-enabled").checked = false;
+      document.querySelector("#volume-level").value = 1;
+      document.querySelector("#time-limit").value = 30;
+      document.querySelector("#time-limit-enabled").checked = false;
+    });
     //
     this.render(pageNode);
   };
+
+  // Sounds
+  playSound(name) {
+    switch (name) {
+      case "click":
+        document.getElementsByTagName("audio")[0].play();
+        break;
+      case "snap":
+        document.getElementsByTagName("audio")[1].play();
+        break;
+    }
+  }
+
+  mutePage(pageNode, state) {
+    for (const item of pageNode.getElementsByTagName("audio")) {
+      item.muted = state;
+    }
+  }
+
+  changePageVolume(pageNode, level) {
+    for (const item of pageNode.getElementsByTagName("audio")) {
+      item.volume = level;
+    }
+  }
 }
 
 /* Run application */
