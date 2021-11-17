@@ -11,22 +11,24 @@ class AppSettings {}
 class View {
   constructor() {
     // this.appState = new AppState();
+    this.currentPage = null;
   }
 
-  showHomePage() {
+  createHomePage() {
     const content = document.createElement("div");
+    content.id = "home-page";
     content.innerHTML = `
       <header>
         <h1>Art-Quiz</h1>
       </header>
       <main>
-        <button>Artists quiz</button>
+        <button id="artists-quiz-btn">Artists quiz</button>
         <br />
         <br />
-        <button>Paintings quiz</button>
+        <button id="paintings-quiz-btn">Paintings quiz</button>
         <br />
         <br />
-        <button>Settings</button>
+        <button id="settings-btn">Settings</button>
         <br />
         <br />
       </main>
@@ -40,8 +42,9 @@ class View {
     return content;
   }
 
-  showSettingsPage() {
+  createSettingsPage() {
     const content = document.createElement("div");
+    content.id = "settings-page";
     content.innerHTML = `
       <main>
         <h2>Settings</h2>
@@ -64,9 +67,34 @@ class View {
           <input type="number" name="time" id="time" min="5" max="30" step="5" />
         </section>
         <br />
-        <button>Cancel</button>
+        <button id="cancel-btn">Cancel</button>
         <button>Save</button>
         <button>Default</button>
+      </main>`;
+    return content;
+  }
+
+  createGroupsPage() {
+    const content = document.createElement("div");
+    content.id = "quiz-groups-page";
+    content.innerHTML = `
+      <header>
+        <h2>AQ-logo</h2>
+        <button>Score</button>
+        <span>Groups</span>
+        <button id="home-page-btn">Home</button>
+      </header>
+      <main>
+        <div class="group-card">
+          <h3>Group 1</h3>
+          <p>7/10</p>
+          <img src="#" alt="Group cover" />
+        </div>
+        <div class="group-card">
+          <h3>Group 10</h3>
+          <p>-/10</p>
+          <img src="#" alt="Group cover" />
+        </div>
       </main>`;
     return content;
   }
@@ -81,19 +109,58 @@ class AppController {
     this.settings = new AppSettings();
   }
 
-  run() {
-    this.render(this.view.showHomePage());
-    this.render(this.view.showSettingsPage());
+  init() {
+    this.view.currentPage = this.view.createHomePage();
+    this.render();
   }
 
-  render(page) {
+  render() {
     const viewPort = document.querySelector("#app");
     viewPort.innerHTML = "";
-    viewPort.appendChild(page);
+    const pageNode = this.view.currentPage;
+    this.addPageEvents(pageNode);
+    viewPort.appendChild(pageNode);
+  }
+
+  btnHandlerHome = () => {
+    this.view.currentPage = this.view.createHomePage();
+    this.render();
+  };
+  btnHandlerArtistsQuiz = () => {
+    this.view.currentPage = this.view.createGroupsPage();
+    this.render();
+  };
+  btnHandlerPaintingsQuiz = () => {
+    this.view.currentPage = this.view.createGroupsPage();
+    this.render();
+  };
+  btnHandlerSettings = () => {
+    this.view.currentPage = this.view.createSettingsPage();
+    this.render();
+  };
+
+  addPageEvents(pageNode) {
+    if (pageNode.id === "home-page") {
+      // Home page events
+      const btnSettings = pageNode.querySelector("#settings-btn");
+      btnSettings.addEventListener("click", this.btnHandlerSettings);
+      const btnArtistsQuiz = pageNode.querySelector("#artists-quiz-btn");
+      btnArtistsQuiz.addEventListener("click", this.btnHandlerArtistsQuiz);
+      const btnPaintingsQuiz = pageNode.querySelector("#paintings-quiz-btn");
+      btnPaintingsQuiz.addEventListener("click", this.btnHandlerPaintingsQuiz);
+    } else if (pageNode.id === "settings-page") {
+      // Settings page events
+      const btnCancel = pageNode.querySelector("#cancel-btn");
+      btnCancel.addEventListener("click", this.btnHandlerHome);
+    } else if (pageNode.id === "quiz-groups-page") {
+      // Quiz groups page events
+      const btnHome = pageNode.querySelector("#home-page-btn");
+      btnHome.addEventListener("click", this.btnHandlerHome);
+    }
   }
 }
 
-/* App init */
+/* Run application */
 
 const app = new AppController();
-app.run();
+app.init();
