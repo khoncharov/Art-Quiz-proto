@@ -85,15 +85,16 @@ class View {
         <button id="home-page-btn">Home</button>
       </header>
       <main>
-        <div class="group-card">
+        <!-- Looks like array -->
+        <div class="group-card" style="background-color: aquamarine">
           <h3>Group 1</h3>
           <p>7/10</p>
-          <img src="#" alt="Group cover" />
+          <img src="./assets/img/default100.jpg" alt="Group cover" />
         </div>
-        <div class="group-card">
+        <div class="group-card" style="background-color: aquamarine">
           <h3>Group 10</h3>
           <p>-/10</p>
-          <img src="#" alt="Group cover" />
+          <img src="./assets/img/default100.jpg" alt="Group cover" />
         </div>
       </main>`;
     return content;
