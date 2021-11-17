@@ -1,19 +1,41 @@
 /* Modedl */
 
-// import { AppState } from "./js/app-states";
+// --- Quiz results class
+class QuizResults {
+  constructor() {}
+}
+// --- End of class
 
-class AppModel {}
+// --- Application settings class
+class AppSettings {
+  constructor() {
+    this._options = JSON.parse(localStorage.getItem("options")) ?? {
+      soundsEnabled: false,
+      volume: 0.5,
+      timeLimitEnabled: false,
+      timeLimit: 30,
+    };
+  }
 
-class AppSettings {}
+  get options() {
+    return this._options;
+  }
+  set options(value) {
+    this._options = value;
+    localStorage.setItem("options", JSON.stringify(value));
+  }
+}
+// --- End of class
+
+// --- Quiz model class
+class AppModel {
+  constructor() {}
+}
+// --- End of class
 
 /* View */
 
 class View {
-  constructor() {
-    // this.appState = new AppState();
-    this.currentPage = null;
-  }
-
   createHomePage() {
     const content = document.createElement("div");
     content.id = "home-page";
@@ -42,13 +64,13 @@ class View {
     return content;
   }
 
-  createSettingsPage() {
+  createSettingsPage(data) {
     const content = document.createElement("div");
     content.id = "settings-page";
     content.innerHTML = `
       <main>
         <h2>Settings</h2>
-        <section>
+        <section style="background-color: #ede">
           <h3>Volume</h3>
           <label for="vol-off">
             <span>Turn off volume</span>
@@ -57,7 +79,7 @@ class View {
           <br />
           <input type="range" name="volume" min="0" max="100" step="5" />
         </section>
-        <section>
+        <section style="background-color: #ede">
           <h3>Time limit in seconds</h3>
           <label for="time-off">
             <span>Turn off time limit</span>
@@ -111,54 +133,59 @@ class AppController {
   }
 
   init() {
-    this.view.currentPage = this.view.createHomePage();
-    this.render();
+    this.btnHandlerHome();
   }
 
-  render() {
+  render(pageNode) {
     const viewPort = document.querySelector("#app");
     viewPort.innerHTML = "";
-    const pageNode = this.view.currentPage;
-    this.addPageEvents(pageNode);
     viewPort.appendChild(pageNode);
   }
 
   btnHandlerHome = () => {
-    this.view.currentPage = this.view.createHomePage();
-    this.render();
+    // Create page basic layout
+    const pageData = this.settings.options;
+    const pageNode = this.view.createHomePage(pageData);
+    // Add page events
+    const btnSettings = pageNode.querySelector("#settings-btn");
+    btnSettings.addEventListener("click", this.btnHandlerSettings);
+    const btnArtistsQuiz = pageNode.querySelector("#artists-quiz-btn");
+    btnArtistsQuiz.addEventListener("click", this.btnHandlerArtistsQuiz);
+    const btnPaintingsQuiz = pageNode.querySelector("#paintings-quiz-btn");
+    btnPaintingsQuiz.addEventListener("click", this.btnHandlerPaintingsQuiz);
+    //
+    this.render(pageNode);
   };
   btnHandlerArtistsQuiz = () => {
-    this.view.currentPage = this.view.createGroupsPage();
-    this.render();
+    // Create page basic layout
+    const pageData = this.settings.options;
+    const pageNode = this.view.createGroupsPage(pageData);
+    // Add page events
+    const btnHome = pageNode.querySelector("#home-page-btn");
+    btnHome.addEventListener("click", this.btnHandlerHome);
+    //
+    this.render(pageNode);
   };
   btnHandlerPaintingsQuiz = () => {
-    this.view.currentPage = this.view.createGroupsPage();
-    this.render();
+    // Create page basic layout
+    const pageData = this.settings.options;
+    const pageNode = this.view.createGroupsPage(pageData);
+    // Add page events
+    const btnHome = pageNode.querySelector("#home-page-btn");
+    btnHome.addEventListener("click", this.btnHandlerHome);
+    //
+    this.render(pageNode);
   };
   btnHandlerSettings = () => {
-    this.view.currentPage = this.view.createSettingsPage();
-    this.render();
+    // Create page basic layout
+    const pageData = this.settings.options;
+    const pageNode = this.view.createSettingsPage(pageData);
+    // Add page events
+    const btnCancel = pageNode.querySelector("#cancel-btn");
+    btnCancel.addEventListener("click", this.btnHandlerHome);
+    //
+    this.render(pageNode);
   };
-
-  addPageEvents(pageNode) {
-    if (pageNode.id === "home-page") {
-      // Home page events
-      const btnSettings = pageNode.querySelector("#settings-btn");
-      btnSettings.addEventListener("click", this.btnHandlerSettings);
-      const btnArtistsQuiz = pageNode.querySelector("#artists-quiz-btn");
-      btnArtistsQuiz.addEventListener("click", this.btnHandlerArtistsQuiz);
-      const btnPaintingsQuiz = pageNode.querySelector("#paintings-quiz-btn");
-      btnPaintingsQuiz.addEventListener("click", this.btnHandlerPaintingsQuiz);
-    } else if (pageNode.id === "settings-page") {
-      // Settings page events
-      const btnCancel = pageNode.querySelector("#cancel-btn");
-      btnCancel.addEventListener("click", this.btnHandlerHome);
-    } else if (pageNode.id === "quiz-groups-page") {
-      // Quiz groups page events
-      const btnHome = pageNode.querySelector("#home-page-btn");
-      btnHome.addEventListener("click", this.btnHandlerHome);
-    }
-  }
 }
 
 /* Run application */
