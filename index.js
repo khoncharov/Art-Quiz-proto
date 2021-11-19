@@ -314,7 +314,7 @@ class AppController {
   }
 
   init() {
-    this.btnHandlerHome();
+    this.getHomePage();
   }
 
   render(pageNode) {
@@ -325,39 +325,41 @@ class AppController {
 
   // User actions handlers
   //
-  btnHandlerHome = () => {
+  getHomePage = () => {
     // Create page basic layout
     const pageNode = this.view.createHomePage();
     // Add page events
     const btnSettings = pageNode.querySelector("#settings-btn");
-    btnSettings.addEventListener("click", this.btnHandlerSettings);
+    btnSettings.addEventListener("click", this.getSettingsPage);
     const btnArtistsQuiz = pageNode.querySelector("#artists-quiz-btn");
-    btnArtistsQuiz.addEventListener("click", this.btnHandlerArtistsQuiz);
+    btnArtistsQuiz.addEventListener("click", this.getArtistsQuizPage);
     const btnPaintingsQuiz = pageNode.querySelector("#paintings-quiz-btn");
-    btnPaintingsQuiz.addEventListener("click", this.btnHandlerPaintingsQuiz);
-    //
-    this.render(pageNode);
-  };
-  btnHandlerArtistsQuiz = () => {
-    // Create page basic layout
-    const pageNode = this.view.createGroupsPage();
-    // Add page events
-    const btnHome = pageNode.querySelector("#home-page-btn");
-    btnHome.addEventListener("click", this.btnHandlerHome);
-    //
-    this.render(pageNode);
-  };
-  btnHandlerPaintingsQuiz = () => {
-    // Create page basic layout
-    const pageNode = this.view.createGroupsPage();
-    // Add page events
-    const btnHome = pageNode.querySelector("#home-page-btn");
-    btnHome.addEventListener("click", this.btnHandlerHome);
+    btnPaintingsQuiz.addEventListener("click", this.getPaintingsQuizPage);
     //
     this.render(pageNode);
   };
 
-  btnHandlerSettings = () => {
+  getArtistsQuizPage = () => {
+    // Create page basic layout
+    const pageNode = this.view.createGroupsPage();
+    // Add page events
+    const btnHome = pageNode.querySelector("#home-page-btn");
+    btnHome.addEventListener("click", this.getHomePage);
+    //
+    this.render(pageNode);
+  };
+
+  getPaintingsQuizPage = () => {
+    // Create page basic layout
+    const pageNode = this.view.createGroupsPage();
+    // Add page events
+    const btnHome = pageNode.querySelector("#home-page-btn");
+    btnHome.addEventListener("click", this.getHomePage);
+    //
+    this.render(pageNode);
+  };
+
+  getSettingsPage = () => {
     // Create page basic layout
     const pageData = this.settings.options;
     const pageNode = this.view.createSettingsPage(pageData);
@@ -394,7 +396,7 @@ class AppController {
       }
     });
     const btnHome = pageNode.querySelector("#home-btn");
-    btnHome.addEventListener("click", this.btnHandlerHome);
+    btnHome.addEventListener("click", this.getHomePage);
     const btnSave = pageNode.querySelector("#save-settings-btn");
     btnSave.addEventListener("click", () => {
       this.settings.options = {
