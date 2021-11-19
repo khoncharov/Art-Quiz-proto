@@ -52,17 +52,10 @@ class Task {
 }
 
 class Quiz {
-  constructor() {
-    this.getQuizesData();
+  constructor(data) {
     this.tasks = null;
-    this.data = null;
-    this.quizProgress = null;
-  }
-
-  async getQuizesData() {
-    const res = await fetch("./data/db.json");
-    const data = await res.json();
     this.data = data;
+    this.quizProgress = null;
   }
 
   resetProgress() {
@@ -102,17 +95,21 @@ class Quiz {
 }
 
 class QuizFactory {
+  constructor(data) {
+    this.data = data;
+  }
+
   createArtistsQuiz() {
-    return new ArtistsQuiz();
+    return new ArtistsQuiz(this.data);
   }
   createPaintingQuiz() {
-    return new PaintingsQuiz();
+    return new PaintingsQuiz(this.data);
   }
 }
 
 class ArtistsQuiz extends Quiz {
-  constructor() {
-    super();
+  constructor(data) {
+    super(data);
   }
 
   getTaskQuestion(index) {
@@ -129,8 +126,8 @@ class ArtistsQuiz extends Quiz {
 }
 
 class PaintingsQuiz extends Quiz {
-  constructor() {
-    super();
+  constructor(data) {
+    super(data);
   }
 
   getTaskQuestion() {
@@ -309,12 +306,21 @@ class View {
 class AppController {
   constructor() {
     this.view = new View();
-    // this.model = new AppModel();
+    this.quizFactory = null;
+    this.quiz = null;
     this.settings = new AppSettings();
   }
 
   init() {
-    this.getHomePage();
+    fetch("./data/db.json")
+      .then((res) => res.json())
+      .then((data) => {
+        this.quizFactory = new QuizFactory(data);
+        this.getHomePage();
+      })
+      .catch((err) => {
+        console.error(err);
+      });
   }
 
   render(pageNode) {
@@ -340,6 +346,8 @@ class AppController {
   };
 
   getArtistsQuizPage = () => {
+    // Create quiz instance
+    this.quiz = this.quizFactory.createArtistsQuiz();
     // Create page basic layout
     const pageNode = this.view.createGroupsPage();
     // Add page events
@@ -350,6 +358,8 @@ class AppController {
   };
 
   getPaintingsQuizPage = () => {
+    // Create quiz instance
+    this.quiz = this.quizFactory.createPaintingQuiz();
     // Create page basic layout
     const pageNode = this.view.createGroupsPage();
     // Add page events
