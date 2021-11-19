@@ -55,6 +55,8 @@ class Quiz {
   constructor() {
     this.getQuizesData();
     this.tasks = null;
+    this.data = null;
+    this.quizProgress = null;
   }
 
   async getQuizesData() {
@@ -79,12 +81,6 @@ class Quiz {
     this.resetProgress();
   }
 
-  getTaskQuestion() {}
-
-  getTaskOptions(index) {
-    return this.tasks.task[index].getOptions();
-  }
-
   checkUserGuess(taskIndex, userGuess) {
     const result = this.tasks.task[taskIndex].getImgNum() === userGuess;
     this.quizProgress[taskIndex] = +result;
@@ -93,6 +89,15 @@ class Quiz {
 
   getResult() {
     return this.quizProgress;
+  }
+
+  getImgURL(index, size) {
+    if (size === "full") {
+      return `./assets/pic/full/${index}full.webp`;
+    }
+    if (size === "box") {
+      return `./assets/pic/img/${index}.webp`;
+    }
   }
 }
 
@@ -113,6 +118,14 @@ class ArtistsQuiz extends Quiz {
   getTaskQuestion(index) {
     return `Какую из картин написал ${this.tasks.task[index].getAuthor()}?`;
   }
+
+  getTaskOptions(index) {
+    const options = this.tasks.task[index].getOptions();
+    const formattedOpt = options.map((i) => {
+      return `${i}::${this.getImgURL(this.data.image[i].imageNum, "box")}`;
+    });
+    return formattedOpt;
+  }
 }
 
 class PaintingsQuiz extends Quiz {
@@ -122,6 +135,19 @@ class PaintingsQuiz extends Quiz {
 
   getTaskQuestion() {
     return `Кто автор этой картины?`;
+  }
+
+  getTaskImg(index) {
+    const imgNum = this.tasks.task[index].getImgNum();
+    return this.getImgURL(imgNum, "full");
+  }
+
+  getTaskOptions(index) {
+    const options = this.tasks.task[index].getOptions();
+    const formattedOpt = options.map((i) => {
+      return `${i}::${this.data.image[i].author}`;
+    });
+    return formattedOpt;
   }
 }
 // --- End of Quiz classes
