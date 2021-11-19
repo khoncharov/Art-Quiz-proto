@@ -1,10 +1,136 @@
 /* Modedl */
 
+// --- Quiz classes
+class Task {
+  constructor(taskInfo) {
+    this.data = taskInfo;
+    this.options = this.generateTaskOptions(); // <Array> of "image" index
+  }
+
+  getTaskID() {
+    return +this.data.imageNum;
+  }
+
+  getAuthor() {
+    return this.data.author;
+  }
+
+  getPaintingName() {
+    return this.data.name;
+  }
+
+  getYear() {
+    return this.data.year;
+  }
+
+  getImgNum() {
+    return this.data.imageNum;
+  }
+
+  getOptions() {
+    return this.options;
+  }
+
+  shuffle(arr) {
+    for (let i = arr.length - 1; i > 0; i--) {
+      let j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+  }
+
+  generateTaskOptions() {
+    const arr = [this.getTaskID()];
+    while (arr.length < 4) {
+      const num = Math.floor(Math.random() * 241);
+      if (!arr.includes(num)) {
+        arr.push(num);
+      }
+    }
+    this.shuffle(arr);
+    return arr;
+  }
+}
+
+class Quiz {
+  constructor() {
+    this.getQuizesData();
+    this.tasks = null;
+  }
+
+  async getQuizesData() {
+    const res = await fetch("./data/db.json");
+    const data = await res.json();
+    this.data = data;
+  }
+
+  resetProgress() {
+    this.quizProgress = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+  }
+
+  generateNewQuiz(group) {
+    const tasks = [];
+    for (let i = 0; i < 10; i++) {
+      const taskInfo = this.data.image[i + group * 10];
+      tasks.push(new Task(taskInfo));
+    }
+    this.tasks = {
+      task: tasks,
+    };
+    this.resetProgress();
+  }
+
+  getTaskQuestion() {}
+
+  getTaskOptions(index) {
+    return this.tasks.task[index].getOptions();
+  }
+
+  checkUserGuess(taskIndex, userGuess) {
+    const result = this.tasks.task[taskIndex].getImgNum() === userGuess;
+    this.quizProgress[taskIndex] = +result;
+    return result;
+  }
+
+  getResult() {
+    return this.quizProgress;
+  }
+}
+
+class QuizFactory {
+  createArtistsQuiz() {
+    return new ArtistsQuiz();
+  }
+  createPaintingQuiz() {
+    return new PaintingsQuiz();
+  }
+}
+
+class ArtistsQuiz extends Quiz {
+  constructor() {
+    super();
+  }
+
+  getTaskQuestion(index) {
+    return `Какую из картин написал ${this.tasks.task[index].getAuthor()}?`;
+  }
+}
+
+class PaintingsQuiz extends Quiz {
+  constructor() {
+    super();
+  }
+
+  getTaskQuestion() {
+    return `Кто автор этой картины?`;
+  }
+}
+// --- End of Quiz classes
+
 // --- Quiz results class
 class QuizResults {
   constructor() {}
 }
-// --- End of class
+// --- End of Quiz results class
 
 // --- Application settings class
 class AppSettings {
@@ -25,13 +151,7 @@ class AppSettings {
     localStorage.setItem("options", JSON.stringify(value));
   }
 }
-// --- End of class
-
-// --- Quiz model class
-class AppModel {
-  constructor() {}
-}
-// --- End of class
+// --- End of Application settings class
 
 /* View */
 
@@ -56,7 +176,7 @@ class View {
       </main>
       <footer>
         <p>2021</p>
-        <a href="https://github.com/khoncharov/">My Githup</a>
+        <a href="https://github.com/khoncharov/">My Github</a>
         <br />
         <br />
         <a href="https://rs.school/js/">RSSchool</a>
@@ -68,8 +188,10 @@ class View {
     const content = document.createElement("div");
     content.id = "settings-page";
     content.innerHTML = `
-      <main>
+      <header>
         <h2>Settings</h2>
+      </header>
+      <main>
         <section style="background-color: #ede">
           <h3>Sounds</h3>
           <label for="sounds-enabled">
@@ -113,23 +235,44 @@ class View {
     content.id = "quiz-groups-page";
     content.innerHTML = `
       <header>
-        <h2>AQ-logo</h2>
-        <button>Score</button>
-        <span>Groups</span>
-        <button id="home-page-btn">Home</button>
+        <h2>AQ-logo</h2>        
       </header>
       <main>
-        <!-- Looks like array -->
-        <div class="group-card" style="background-color: aquamarine">
-          <h3>Group 1</h3>
-          <p>7/10</p>
-          <img src="./assets/img/default100.jpg" alt="Group cover" />
+        <div>
+          <button id="home-page-btn">Home</button>          
+          <span>Groups</span>
+          <button>Score</button>  
         </div>
-        <div class="group-card" style="background-color: aquamarine">
-          <h3>Group 10</h3>
-          <p>-/10</p>
-          <img src="./assets/img/default100.jpg" alt="Group cover" />
-        </div>
+        <ul>
+          <li>
+            <div class="group-card" style="background-color: aquamarine">
+              <h3>Group 1</h3>
+              <p>7/10</p>
+              <img src="./assets/img/default100.jpg" alt="Group cover" />
+            </div>
+          </li>
+          <li>
+            <div class="group-card" style="background-color: aquamarine">
+              <h3>Group 1</h3>
+              <p>7/10</p>
+              <img src="./assets/img/default100.jpg" alt="Group cover" />
+            </div>
+          </li>
+          <li>
+            <div class="group-card" style="background-color: aquamarine">
+              <h3>Group 1</h3>
+              <p>7/10</p>
+              <img src="./assets/img/default100.jpg" alt="Group cover" />
+            </div>
+          </li>
+          <li>
+            <div class="group-card" style="background-color: aquamarine">
+              <h3>Group 1</h3>
+              <p>7/10</p>
+              <img src="./assets/img/default100.jpg" alt="Group cover" />
+            </div>
+          </li>
+        </ul>        
       </main>`;
     return content;
   }
@@ -140,7 +283,7 @@ class View {
 class AppController {
   constructor() {
     this.view = new View();
-    this.model = new AppModel();
+    // this.model = new AppModel();
     this.settings = new AppSettings();
   }
 
@@ -201,20 +344,27 @@ class AppController {
     soundsEnabled.addEventListener("click", (e) => {
       this.mutePage(document, !e.target.checked);
       if (e.target.checked) {
-        this.playSound("click");
+        this.playSound(0);
       }
     });
     const volume = pageNode.querySelector("#volume-level");
     volume.addEventListener("change", (e) => {
       this.changePageVolume(document, e.target.value);
-      this.playSound("snap");
+      this.playSound(1);
     });
     const timeLimit = pageNode.querySelector("#time-limit");
     timeLimit.addEventListener("change", (e) => {
+      this.playSound(1);
       if (e.target.value < 5) {
         e.target.value = 5;
       } else if (e.target.value > 30 || e.target.value === "") {
         e.target.value = 30;
+      }
+    });
+    const timeLimitEnabled = pageNode.querySelector("#time-limit-enabled");
+    timeLimitEnabled.addEventListener("click", (e) => {
+      if (e.target.checked) {
+        this.playSound(0);
       }
     });
     const btnHome = pageNode.querySelector("#home-btn");
@@ -240,15 +390,12 @@ class AppController {
   };
 
   // Sounds
-  playSound(name) {
-    switch (name) {
-      case "click":
-        document.getElementsByTagName("audio")[0].play();
-        break;
-      case "snap":
-        document.getElementsByTagName("audio")[1].play();
-        break;
-    }
+  playSound(i) {
+    // "click"  -> 0
+    // "snap"   -> 1
+    const sounds = document.getElementsByTagName("audio");
+    sounds[i].currentTime = 0;
+    sounds[i].play();
   }
 
   mutePage(pageNode, state) {
