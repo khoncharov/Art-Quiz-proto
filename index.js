@@ -241,36 +241,55 @@ class View {
       <header>
         <nav class="navBar">
           <button class="uiBtn" id="home-btn">Назад</button>
-          <h2 class="pageCaption">Settings</h2>
+          <h2 class="pageCaption">Настройки</h2>
         </nav>
       </header>
       <main>
-        <section style="background-color: #ede">
-          <h3>Sounds</h3>
-          <label for="sounds-enabled">
-            <span>Enabled</span>
-            <input id="sounds-enabled" type="checkbox" name="vol-off"
-              ${data.soundsEnabled ? "checked" : ""} />
-          </label>
-          <br />
-          <br />
-          <input id="volume-level" type="range" name="volume" min="0.1" max="1" step="0.1"
-            value="${data.volume}"/>
-        </section>
-        <section style="background-color: #ede">
-          <h3>Time limit for a question</h3>
-          <input type="number" id="time-limit" min="5" max="30" step="5"
-            name="time" value="${data.timeLimit}" /> <span>sec</span>
-          <br />
-          <br />
-          <label for="time-limit-enabled">
-            <span>Enabled</span>
-            <input type="checkbox" name="time-off" id="time-limit-enabled"
-              ${data.timeLimitEnabled ? "checked" : ""} />
-          </label>
-        </section>
-        <br />
-        <div class="settingPageControls">
+        <div class="settings-container">
+       
+          <section class="setting-item">
+            <h3 class="settingCaption">Звуки</h3>
+            <label for="sounds-enabled">
+              <span class="settingDescription">включить</span>
+              <input id="sounds-enabled" type="checkbox" name="vol-off"
+                ${data.soundsEnabled ? "checked" : ""} />
+            </label>
+          </section>
+
+          <section class="setting-item">
+            <h3 class="settingCaption">Громкость</h3>
+            <input id="volume-level" type="range" name="volume" min="0.1" max="1" step="0.1"
+              value="${data.volume}"/>
+          </section>
+
+          <section class="setting-item">
+            <h3 class="settingCaption">Время</h3>
+            <label for="time-limit-enabled">
+              <span  class="settingDescription">включить</span>
+              <input type="checkbox" name="time-off" id="time-limit-enabled"
+                ${data.timeLimitEnabled ? "checked" : ""} />
+            </label>
+          </section>
+
+          <section class="setting-item">
+            <h3 class="settingCaption">Секунд</h3>
+            <div> 
+              <button
+                class="stepBtn"
+                id="step-down-btn"
+                type="button"                
+              >&#8211;</button>
+              <input class="settingDescription timeLimitInput" type="number" id="time-limit" min="5" max="30" step="5"
+                name="time" value="${data.timeLimit}" readonly/> 
+              <button
+                class="stepBtn"
+                id="step-up-btn"
+                type="button"                
+              >+</button>
+            </div>
+          </section> 
+        </div>
+        <div class="settingsControls-container">
           <button class="settingCtrlBtn" id="save-settings-btn">Сохранить</button>
           <button class="settingCtrlBtn" id="default-settings-btn">По умолчанию</button>
         </div>
@@ -525,15 +544,18 @@ class AppController {
       this.changePageVolume(document, e.target.value);
       this.playSound(1);
     });
-    const timeLimit = pageNode.querySelector("#time-limit");
-    timeLimit.addEventListener("change", (e) => {
+
+    const stepDownBtn = pageNode.querySelector("#step-down-btn");
+    stepDownBtn.addEventListener("click", (e) => {
+      e.target.nextElementSibling.stepDown();
       this.playSound(1);
-      if (e.target.value < 5) {
-        e.target.value = 5;
-      } else if (e.target.value > 30 || e.target.value === "") {
-        e.target.value = 30;
-      }
     });
+    const stepUpBtn = pageNode.querySelector("#step-up-btn");
+    stepUpBtn.addEventListener("click", (e) => {
+      e.target.previousElementSibling.stepUp();
+      this.playSound(1);
+    });
+
     const timeLimitEnabled = pageNode.querySelector("#time-limit-enabled");
     timeLimitEnabled.addEventListener("click", (e) => {
       if (e.target.checked) {

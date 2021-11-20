@@ -161,11 +161,57 @@ button {
 
 /* Settings page */
 
-.settingPageControls {
+.settings-container {
+  margin: 50px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.setting-item {
+  display: grid;
+  grid-template-columns: 130px 1fr;
+  align-items: center;
+  height: 40px;
+}
+
+.settingCaption {
+  margin: 0;
+  font-size: 2rem;
+  font-weight: 600;
+}
+
+.settingDescription {
+  font-size: 2rem;
+  font-weight: 400;
+}
+
+[type="range"] {
+  margin: 0;
+}
+
+.stepBtn {
+  padding: 0;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background-color: #0075ff;
+  color: white;
+}
+
+.timeLimitInput {
+  margin-left: 10px;
+  border: none;
+  text-align: center;
+}
+
+.settingsControls-container {
+  margin: 0 auto;
+  width: 60%;
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: 20px;
 }
 
 /* Quiz groups page */
