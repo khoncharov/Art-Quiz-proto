@@ -78,18 +78,6 @@ class Quiz {
     this.quizProgress = new Array(10).fill(-1);
   }
 
-  generateNewQuiz(group) {
-    const tasks = [];
-    for (let i = 0; i < 10; i++) {
-      const taskInfo = this.data.image[i + group * 10];
-      tasks.push(new Task(taskInfo));
-    }
-    this.tasks = {
-      task: tasks,
-    };
-    this.resetProgress();
-  }
-
   checkUserGuess(taskIndex, userGuess) {
     const result = this.tasks.task[taskIndex].getImgNum() === userGuess;
     this.quizProgress[taskIndex] = +result;
@@ -115,6 +103,18 @@ class ArtistsQuiz extends Quiz {
     super(data);
   }
 
+  generateNewQuiz(group) {
+    const tasks = [];
+    for (let i = 0; i < 10; i++) {
+      const taskInfo = this.data.image[i + group * 10];
+      tasks.push(new Task(taskInfo));
+    }
+    this.tasks = {
+      task: tasks,
+    };
+    this.resetProgress();
+  }
+
   getTaskQuestion(index) {
     return `Какую из картин написал<br>${this.tasks.task[index].getAuthor()}?`;
   }
@@ -131,6 +131,18 @@ class ArtistsQuiz extends Quiz {
 class PaintingsQuiz extends Quiz {
   constructor(data) {
     super(data);
+  }
+
+  generateNewQuiz(group) {
+    const tasks = [];
+    for (let i = 0; i < 10; i++) {
+      const taskInfo = this.data.image[i + group * 10 + 120];
+      tasks.push(new Task(taskInfo));
+    }
+    this.tasks = {
+      task: tasks,
+    };
+    this.resetProgress();
   }
 
   getTaskQuestion() {
