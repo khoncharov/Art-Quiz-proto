@@ -2,11 +2,10 @@
 
 #app {
   margin: 0 auto;
-  padding: 10px;
-  width: 100%;
-  height: 100%;
-  background-color: #ffffff;
   overflow: auto;
+  background-color: #ffffff;
+  height: 100%;
+  padding: 5px;
 }
 
 /* Hiden element */
@@ -65,13 +64,52 @@ button {
   background-color: #00c521;
 }
 
+/* UI header navigation */
+
+.navBar {
+  display: grid;
+  grid-template-columns: 0.6fr 1fr 0.6fr;
+  justify-items: center;
+  align-items: center;
+}
+
+/* UI Page caption */
+
+.pageCaption {
+  margin: 0;
+  font-size: 2rem;
+  font-weight: 600;
+  line-height: 4.6rem;
+}
+
 /* Home page */
 
+#home-page {
+  display: grid;
+  grid-template-rows: max-content max-content 1fr;
+}
+
+.home-header {
+  height: 20vh;
+}
+
+.home-main {
+  height: 30vh;
+}
+
+.home-footer {
+  height: 48vh;
+  display: flex;
+  align-items: flex-end;
+}
+
 .logo {
+  margin: 0;
   padding: 0;
   text-transform: uppercase;
   font-size: 4rem;
   font-weight: 700;
+  line-height: 20vh;
   color: crimson;
   text-align: center;
 }
@@ -82,19 +120,13 @@ button {
   flex-direction: column;
   justify-content: space-around;
   width: 60%;
-  height: 30vh;
-}
-
-.footer {
-  margin: 0 auto;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  width: 80%;
-  height: 30vh;
+  height: 100%;
 }
 
 .footer-container {
+  margin: 0 auto;
+  padding-bottom: 70px;
+  width: 90%;
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
   align-items: center;
@@ -119,7 +151,7 @@ button {
   height: 30px;
 }
 
-.year {
+.creation-year {
   text-align: center;
   font-size: 1.6rem;
   font-weight: 600;
@@ -136,16 +168,43 @@ button {
   gap: 10px;
 }
 
+/* Quiz groups page */
+
+/* Quiz group card */
+
+.groupCard {
+  margin: 10px 0;
+  height: 100px;
+  border-radius: 2rem;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  background-repeat: no-repeat;
+  background-position: 50% 20%;
+  /* filter: saturate(0); */
+}
+
+.cardCaption {
+  width: max-content;
+  height: max-content;
+  margin: 0;
+  padding: 5px 20px;
+  font-size: 1.6rem;
+  font-weight: 600;
+  line-height: 3rem;
+  color: #323232;
+  border-radius: 2rem;
+  text-align: center;
+  background-color: rgba(255, 255, 255, 0.7);
+}
+
+.groupScore {
+  font-weight: 400;
+}
+
 /* Quiz page */
 
 /* Quiz header */
-
-.quizNavBar {
-  display: grid;
-  grid-template-columns: 0.6fr 1fr 0.6fr;
-  justify-items: center;
-  align-items: center;
-}
 
 .timer {
   font-size: 2.5rem;
@@ -168,7 +227,8 @@ button {
 /* Task progress bar */
 
 .progressBar {
-  padding: 10px 50px;
+  margin-top: 20px;
+  padding: 0 50px;
   display: flex;
   flex-direction: row;
   justify-content: space-around;
@@ -245,7 +305,7 @@ button {
 }
 
 .taskBtn {
-  font-size: 2rem;
+  font-size: 1.6rem;
   font-weight: 400;
   line-height: 3rem;
   border: none;

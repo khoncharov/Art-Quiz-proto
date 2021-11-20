@@ -59,7 +59,7 @@ class Quiz {
   }
 
   resetProgress() {
-    this.quizProgress = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+    this.quizProgress = new Array(10).fill(0);
   }
 
   generateNewQuiz(group) {
@@ -151,7 +151,22 @@ class PaintingsQuiz extends Quiz {
 
 // --- Quiz results class
 class QuizResults {
-  constructor() {}
+  constructor() {
+    this._options = JSON.parse(localStorage.getItem("options")) ?? {
+      soundsEnabled: false,
+      volume: 1, // 0 - 1
+      timeLimitEnabled: false,
+      timeLimit: 30, // [5 - 30] step 5 seconds
+    };
+  }
+
+  get options() {
+    return this._options;
+  }
+  set options(value) {
+    this._options = value;
+    localStorage.setItem("options", JSON.stringify(value));
+  }
 }
 // --- End of Quiz results class
 
@@ -183,17 +198,19 @@ class View {
     const content = document.createElement("div");
     content.id = "home-page";
     content.innerHTML = `      
-      <header>
+      <header class="home-header">
         <h1 class="logo">Art quiz</h1>
       </header>
-      <main>
+
+      <main class="home-main">
         <div class="controls">
           <button class="uiBtn" id="artists-quiz-btn">Художники</button>
           <button class="uiBtn" id="paintings-quiz-btn">Картины</button>
           <button class="uiBtn" id="settings-btn">Настройки</button>
         </div>
       </main>
-      <footer class="footer">
+
+      <footer class="home-footer">
         <div class="footer-container">
           <a class="link" href="https://github.com/khoncharov/" title="Мой github">
             <img class="github-logo" src="/assets/svg/github.svg" alt="github logo" />
@@ -205,7 +222,7 @@ class View {
               alt="rsschool logo"
             />
           </a>
-          <p class="year">2021</p>
+          <p class="creation-year">2021</p>
         </div>
       </footer>`;
     return content;
@@ -215,11 +232,13 @@ class View {
     const content = document.createElement("div");
     content.id = "settings-page";
     content.innerHTML = `
-    <header>
-        <h2>Settings</h2>
-        </header>
+      <header>
+        <nav class="navBar">
+          <button class="uiBtn" id="home-btn">Назад</button>
+          <h2 class="pageCaption">Settings</h2>
+        </nav>
+      </header>
       <main>
-        <button class="uiBtn" id="home-btn">Домой</button>
         <section style="background-color: #ede">
           <h3>Sounds</h3>
           <label for="sounds-enabled">
@@ -259,24 +278,15 @@ class View {
     return content;
   }
 
-  createGroupsPage(type) {
-    const clr = (quizType) => {
-      if (quizType === "artists") {
-        return "aquamarine";
-      }
-      if (quizType === "paintings") {
-        return "aqua";
-      }
-    };
+  createGroupsPage() {
     let groupList = "";
     for (let i = 0; i < 12; i++) {
       const groupNum = i + 1;
       groupList += `
         <li>
-          <div class="group-card" id="group-card-${i}" style="background-color:
-            ${clr(type)}">
-            <h3>Group ${groupNum}</h3>
-            <p>-/10</p>              
+          <div class="groupCard" id="group-card-${i}">
+            <h3 class="cardCaption">Группа ${groupNum}</h3>
+            <p class="cardCaption groupScore">10/10</p>              
           </div>
         </li>`;
     }
@@ -284,13 +294,13 @@ class View {
     content.id = "quiz-groups-page";
     content.innerHTML = `
       <header>               
+        <nav class="navBar">
+          <button class="uiBtn" id="home-page-btn">Назад</button>          
+          <h2 class="pageCaption">Группы</h2>
+          <button class="uiBtn">Счёт</button>  
+        </nav>
       </header>
       <main>
-        <div>
-          <button id="home-page-btn">Home</button>          
-          <span>Groups</span>
-          <button>Score</button>  
-        </div>
         <ul>
           ${groupList}                    
         </ul>        
@@ -302,13 +312,49 @@ class View {
     const content = document.createElement("div");
     content.id = "quiz-contest-page";
     content.innerHTML = `
-      <header>
-        home btn // counter
-        progress bar
+      <header class="header">
+        <nav class="navBar">
+          <button class="uiBtn" id="back-btn">Назад</button>
+          <span class="timer">30</span>
+          <span class="taskCounter">&#8249;&#8249; 5 &#8250;&#8250;</span>
+        </nav>        
       </header>
-      <main>
-        <h3>Question</h3>
-
+      <div class="progressBar">
+        <span class="bullet rightAnswer"></span>
+        <span class="bullet wrongAnswer"></span>
+        <span class="bullet rightAnswer"></span>
+        <span class="bullet wrongAnswer"></span>
+        <span class="bullet"></span>
+        <span class="bullet"></span>
+        <span class="bullet"></span>
+        <span class="bullet"></span>
+        <span class="bullet"></span>
+        <span class="bullet"></span>
+      </div>
+      <main class="main">
+        <section class="taskCard" id="quiz-task-0">
+          <div class="taskQuestion-container">
+            <h3 class="taskQuestion">Кто автор этой картины?</h3>
+          </div>
+          <div class="taskImg-container">
+            <img class="taskImg" src="../assets/pic/img/2.webp" alt="Painting" />
+          </div>
+          <div class="taskBtn-container">
+            <button class="taskBtn">Карл Юнг</button>
+            <button class="taskBtn">Жак Лакан</button>
+            <button class="taskBtn">Зигмунд Фрейд</button>
+            <button class="taskBtn">Жан Бодрияр</button>
+          </div>
+        </section>
+        <div class="overlay hidden"></div>
+        <div class="result-container hidden" id="quiz-task-result">
+          <div class="resultBadge failBadge"></div>
+          <img class="resultImg" src="../assets/pic/full/12full.webp" alt="Painting" />
+          <div class="paintingCaption">Девочка на шаре</div>
+          <div class="paintingAthor">Пабло Пикассо, 1905</div>
+          <button class="uiBtn">Продолжить</button>
+        </div>
+        <div id="quiz-result"></div>
       </main>`;
     return content;
   }
@@ -342,6 +388,7 @@ class AppController {
       .then((res) => res.json())
       .then((data) => {
         this.quizFactory = new QuizFactory(data);
+        this.preloadGroupCovers();
         this.getHomePage();
       })
       .catch((err) => {
@@ -355,6 +402,15 @@ class AppController {
     viewPort.appendChild(pageNode);
   }
 
+  preloadGroupCovers() {
+    const list = [];
+    for (let i = 0; i < 24; i++) {
+      const img = new Image();
+      img.src = `/assets/pic/img/${i * 10 + 4}.webp`;
+      list.push(img);
+    }
+  }
+
   // User actions handlers
   //
   getHomePage = () => {
@@ -364,14 +420,15 @@ class AppController {
     const btnSettings = pageNode.querySelector("#settings-btn");
     btnSettings.addEventListener("click", this.getSettingsPage);
     const btnArtistsQuiz = pageNode.querySelector("#artists-quiz-btn");
-    btnArtistsQuiz.addEventListener("click", this.getArtistsQuizPage);
+    btnArtistsQuiz.addEventListener("click", this.getAGroupsPage);
     const btnPaintingsQuiz = pageNode.querySelector("#paintings-quiz-btn");
-    btnPaintingsQuiz.addEventListener("click", this.getPaintingsQuizPage);
+    btnPaintingsQuiz.addEventListener("click", this.getPGroupsPage);
     //
     this.render(pageNode);
   };
 
-  getArtistsQuizPage = () => {
+  getAGroupsPage = () => {
+    const group = (element) => +element.id.split("-")[2];
     // Create quiz instance
     this.quiz = this.quizFactory.createArtistsQuiz();
     // Create page basic layout
@@ -379,11 +436,20 @@ class AppController {
     // Add page events
     const btnHome = pageNode.querySelector("#home-page-btn");
     btnHome.addEventListener("click", this.getHomePage);
+    const cardsCollection = pageNode.getElementsByClassName("groupCard");
+    for (let card of cardsCollection) {
+      card.addEventListener("click", (e) => {
+        this.getQuizPaintings(group(e.currentTarget)); // ----------------------------------
+      });
+      // Add cards background
+      card.style.backgroundImage = `url(/assets/pic/img/${group(card) * 10 + 4}.webp)`;
+    }
     //
     this.render(pageNode);
   };
 
-  getPaintingsQuizPage = () => {
+  getPGroupsPage = () => {
+    const group = (element) => +element.id.split("-")[2];
     // Create quiz instance
     this.quiz = this.quizFactory.createPaintingQuiz();
     // Create page basic layout
@@ -391,20 +457,27 @@ class AppController {
     // Add page events
     const btnHome = pageNode.querySelector("#home-page-btn");
     btnHome.addEventListener("click", this.getHomePage);
-    const cardsCollection = pageNode.getElementsByClassName("group-card");
+    const cardsCollection = pageNode.getElementsByClassName("groupCard");
     for (let card of cardsCollection) {
       card.addEventListener("click", (e) => {
-        const group = +e.currentTarget.id.split("-")[2];
-        this.getQuizPage(group);
+        this.getQuizPaintings(group(e.currentTarget));
       });
+      // Add cards background
+      card.style.backgroundImage = `url(/assets/pic/img/${group(card) * 10 + 124}.webp)`;
     }
     //
     this.render(pageNode);
   };
 
-  getQuizPage(groupIndex) {
-    console.log("Quiz page invoked. Group index", groupIndex);
-  }
+  getQuizPaintings = (groupIndex) => {
+    // Create page basic layout
+    const pageNode = this.view.createQuizPage();
+    // Add page events
+    const btnBack = pageNode.querySelector("#back-btn");
+    btnBack.addEventListener("click", this.getPGroupsPage);
+    //
+    this.render(pageNode);
+  };
 
   getSettingsPage = () => {
     // Create page basic layout
