@@ -152,20 +152,26 @@ class PaintingsQuiz extends Quiz {
 // --- Quiz results class
 class QuizResults {
   constructor() {
-    this._options = JSON.parse(localStorage.getItem("options")) ?? {
-      soundsEnabled: false,
-      volume: 1, // 0 - 1
-      timeLimitEnabled: false,
-      timeLimit: 30, // [5 - 30] step 5 seconds
-    };
+    this._groups =
+      JSON.parse(localStorage.getItem("resultInGroup")) ?? new Array(24).fill(-1);
   }
 
-  get options() {
-    return this._options;
+  get groups() {
+    return this._groups;
   }
-  set options(value) {
-    this._options = value;
-    localStorage.setItem("options", JSON.stringify(value));
+  set groups(value) {
+    this._groups = value;
+    localStorage.setItem("resultInGroup", JSON.stringify(value));
+  }
+
+  getGroupResult(index) {
+    return this.groups[index];
+  }
+
+  setGroupResult(index, value) {
+    const results = this.groups;
+    results[index] = value;
+    this.groups = results;
   }
 }
 // --- End of Quiz results class
@@ -284,9 +290,9 @@ class View {
       const groupNum = i + 1;
       groupList += `
         <li>
-          <div class="groupCard" id="group-card-${i}">
+          <div class="groupCard bwCard" id="group-card-${i}">
             <h3 class="cardCaption">Группа ${groupNum}</h3>
-            <p class="cardCaption groupScore">10/10</p>              
+            <p class="cardCaption groupScore hidden"></p>              
           </div>
         </li>`;
     }
@@ -381,6 +387,7 @@ class AppController {
     this.quizFactory = null;
     this.quiz = null;
     this.settings = new AppSettings();
+    this.results = new QuizResults();
   }
 
   init() {
@@ -443,6 +450,15 @@ class AppController {
       });
       // Add cards background
       card.style.backgroundImage = `url(/assets/pic/img/${group(card) * 10 + 4}.webp)`;
+      // Add results on card
+      const delta = 0;
+      const groupResult = this.results.getGroupResult(group(card) + delta);
+      if (groupResult !== -1) {
+        card.classList.remove("bwCard");
+        const score = card.lastElementChild;
+        score.classList.remove("hidden");
+        score.textContent = `${groupResult}/10`;
+      }
     }
     //
     this.render(pageNode);
@@ -464,6 +480,15 @@ class AppController {
       });
       // Add cards background
       card.style.backgroundImage = `url(/assets/pic/img/${group(card) * 10 + 124}.webp)`;
+      // Add results on card
+      const delta = 12;
+      const groupResult = this.results.getGroupResult(group(card) + delta);
+      if (groupResult !== -1) {
+        card.classList.remove("bwCard");
+        const score = card.lastElementChild;
+        score.classList.remove("hidden");
+        score.textContent = `${groupResult}/10`;
+      }
     }
     //
     this.render(pageNode);
