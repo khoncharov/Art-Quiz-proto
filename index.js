@@ -113,7 +113,7 @@ class ArtistsQuiz extends Quiz {
   }
 
   getTaskQuestion(index) {
-    return `Какую из картин написал ${this.tasks.task[index].getAuthor()}?`;
+    return `Какую из картин написал<br>${this.tasks.task[index].getAuthor()}?`;
   }
 
   getTaskOptions(index) {
@@ -182,27 +182,31 @@ class View {
   createHomePage() {
     const content = document.createElement("div");
     content.id = "home-page";
-    content.innerHTML = `
+    content.innerHTML = `      
       <header>
-        <h1>Art-Quiz</h1>
+        <h1 class="logo">Art quiz</h1>
       </header>
       <main>
-        <button id="artists-quiz-btn">Artists quiz</button>
-        <br />
-        <br />
-        <button id="paintings-quiz-btn">Paintings quiz</button>
-        <br />
-        <br />
-        <button id="settings-btn">Settings</button>
-        <br />
-        <br />
+        <div class="controls">
+          <button class="uiBtn" id="artists-quiz-btn">Художники</button>
+          <button class="uiBtn" id="paintings-quiz-btn">Картины</button>
+          <button class="uiBtn" id="settings-btn">Настройки</button>
+        </div>
       </main>
-      <footer>
-        <p>2021</p>
-        <a href="https://github.com/khoncharov/">My Github</a>
-        <br />
-        <br />
-        <a href="https://rs.school/js/">RSSchool</a>
+      <footer class="footer">
+        <div class="footer-container">
+          <a class="link" href="https://github.com/khoncharov/" title="Мой github">
+            <img class="github-logo" src="/assets/svg/github.svg" alt="github logo" />
+          </a>          
+          <a class="link" href="https://rs.school/js/" title="RSSchool курс JS">
+            <img
+              class="rss-logo"
+              src="/assets/svg/rs_school_js.svg"
+              alt="rsschool logo"
+            />
+          </a>
+          <p class="year">2021</p>
+        </div>
       </footer>`;
     return content;
   }
@@ -211,10 +215,11 @@ class View {
     const content = document.createElement("div");
     content.id = "settings-page";
     content.innerHTML = `
-      <header>
+    <header>
         <h2>Settings</h2>
-      </header>
+        </header>
       <main>
+        <button class="uiBtn" id="home-btn">Домой</button>
         <section style="background-color: #ede">
           <h3>Sounds</h3>
           <label for="sounds-enabled">
@@ -240,9 +245,10 @@ class View {
           </label>
         </section>
         <br />
-        <button id="home-btn">Home</button>
-        <button id="save-settings-btn">Save</button>
-        <button id="default-settings-btn">Default</button>
+        <div class="settingPageControls">
+          <button class="settingCtrlBtn" id="save-settings-btn">Сохранить</button>
+          <button class="settingCtrlBtn" id="default-settings-btn">По умолчанию</button>
+        </div>
       </main>
       <audio preload="auto">
         <source src="/assets/sounds/button-30.mp3" type="audio/mpeg">
@@ -253,12 +259,31 @@ class View {
     return content;
   }
 
-  createGroupsPage() {
+  createGroupsPage(type) {
+    const clr = (quizType) => {
+      if (quizType === "artists") {
+        return "aquamarine";
+      }
+      if (quizType === "paintings") {
+        return "aqua";
+      }
+    };
+    let groupList = "";
+    for (let i = 0; i < 12; i++) {
+      const groupNum = i + 1;
+      groupList += `
+        <li>
+          <div class="group-card" id="group-card-${i}" style="background-color:
+            ${clr(type)}">
+            <h3>Group ${groupNum}</h3>
+            <p>-/10</p>              
+          </div>
+        </li>`;
+    }
     const content = document.createElement("div");
     content.id = "quiz-groups-page";
     content.innerHTML = `
-      <header>
-        <h2>AQ-logo</h2>        
+      <header>               
       </header>
       <main>
         <div>
@@ -267,35 +292,36 @@ class View {
           <button>Score</button>  
         </div>
         <ul>
-          <li>
-            <div class="group-card" style="background-color: aquamarine">
-              <h3>Group 1</h3>
-              <p>7/10</p>
-              <img src="./assets/img/default100.jpg" alt="Group cover" />
-            </div>
-          </li>
-          <li>
-            <div class="group-card" style="background-color: aquamarine">
-              <h3>Group 1</h3>
-              <p>7/10</p>
-              <img src="./assets/img/default100.jpg" alt="Group cover" />
-            </div>
-          </li>
-          <li>
-            <div class="group-card" style="background-color: aquamarine">
-              <h3>Group 1</h3>
-              <p>7/10</p>
-              <img src="./assets/img/default100.jpg" alt="Group cover" />
-            </div>
-          </li>
-          <li>
-            <div class="group-card" style="background-color: aquamarine">
-              <h3>Group 1</h3>
-              <p>7/10</p>
-              <img src="./assets/img/default100.jpg" alt="Group cover" />
-            </div>
-          </li>
+          ${groupList}                    
         </ul>        
+      </main>`;
+    return content;
+  }
+
+  createQuizPage() {
+    const content = document.createElement("div");
+    content.id = "quiz-contest-page";
+    content.innerHTML = `
+      <header>
+        home btn // counter
+        progress bar
+      </header>
+      <main>
+        <h3>Question</h3>
+
+      </main>`;
+    return content;
+  }
+
+  createQuizResultPage() {
+    const content = document.createElement("div");
+    content.id = "quiz-result-page";
+    content.innerHTML = `
+      <header>
+        
+      </header>
+      <main>
+
       </main>`;
     return content;
   }
@@ -349,7 +375,7 @@ class AppController {
     // Create quiz instance
     this.quiz = this.quizFactory.createArtistsQuiz();
     // Create page basic layout
-    const pageNode = this.view.createGroupsPage();
+    const pageNode = this.view.createGroupsPage("artists");
     // Add page events
     const btnHome = pageNode.querySelector("#home-page-btn");
     btnHome.addEventListener("click", this.getHomePage);
@@ -361,13 +387,24 @@ class AppController {
     // Create quiz instance
     this.quiz = this.quizFactory.createPaintingQuiz();
     // Create page basic layout
-    const pageNode = this.view.createGroupsPage();
+    const pageNode = this.view.createGroupsPage("paintings");
     // Add page events
     const btnHome = pageNode.querySelector("#home-page-btn");
     btnHome.addEventListener("click", this.getHomePage);
+    const cardsCollection = pageNode.getElementsByClassName("group-card");
+    for (let card of cardsCollection) {
+      card.addEventListener("click", (e) => {
+        const group = +e.currentTarget.id.split("-")[2];
+        this.getQuizPage(group);
+      });
+    }
     //
     this.render(pageNode);
   };
+
+  getQuizPage(groupIndex) {
+    console.log("Quiz page invoked. Group index", groupIndex);
+  }
 
   getSettingsPage = () => {
     // Create page basic layout

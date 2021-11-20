@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Templates</title>
+    <link rel="icon" type="image/x-icon" href="../assets/favicon.ico" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../style.css" />
+  </head>
+  <body>
+    <!-- style="display: none" -->
+    <div id="app" style="display: none">
+      <div id="quiz-question">
+        <header class="header">
+          <nav class="quizNavBar">
+            <button class="uiBtn">Home</button>
+            <span class="timer">30</span>
+            <span class="taskCounter">&#8249;&#8249; 5 &#8250;&#8250;</span>
+          </nav>
+          <div class="progressBar">
+            <span class="bullet rightAnswer"></span>
+            <span class="bullet wrongAnswer"></span>
+            <span class="bullet rightAnswer"></span>
+            <span class="bullet wrongAnswer"></span>
+            <span class="bullet"></span>
+            <span class="bullet"></span>
+            <span class="bullet"></span>
+            <span class="bullet"></span>
+            <span class="bullet"></span>
+            <span class="bullet"></span>
+          </div>
+        </header>
+        <main class="main">
+          <section class="taskCard" id="quiz-task-0">
+            <div class="taskQuestion-container">
+              <h3 class="taskQuestion">Кто автор этой картины?</h3>
+            </div>
+            <div class="taskImg-container">
+              <img class="taskImg" src="../assets/pic/img/2.webp" alt="Painting" />
+            </div>
+            <div class="taskBtn-container">
+              <button class="taskBtn">Карл Юнг</button>
+              <button class="taskBtn">Жак Лакан</button>
+              <button class="taskBtn">Зигмунд Фрейд</button>
+              <button class="taskBtn">Жан Бодрияр</button>
+            </div>
+          </section>
+          <div class="overlay hidden"></div>
+          <div class="result-container hidden" id="quiz-task-result">
+            <div class="resultBadge failBadge"></div>
+            <img class="resultImg" src="../assets/pic/full/12full.webp" alt="Painting" />
+            <div class="paintingCaption">Девочка на шаре</div>
+            <div class="paintingAthor">Пабло Пикассо, 1905</div>
+            <button class="uiBtn">Продолжить</button>
+          </div>
+          <div id="quiz-result"></div>
+        </main>
+      </div>
+    </div>
+    <div id="quiz-result" style="display: none"></div>
+    <!-- HOME PAGE -->
+    <div id="app">
+      <div id="home-page">
+        <header>
+          <h1 class="logo">Art quiz</h1>
+        </header>
+        <main>
+          <div class="controls">
+            <button class="uiBtn" id="artists-quiz-btn">Artists quiz</button>
+            <button class="uiBtn" id="paintings-quiz-btn">Paintings quiz</button>
+            <button class="uiBtn" id="settings-btn">Settings</button>
+          </div>
+        </main>
+        <footer class="footer">
+          <div class="footer-container">
+            <a class="link" href="https://github.com/khoncharov/" title="My github">
+              <img class="github-logo" src="/assets/svg/github.svg" alt="github logo" />
+            </a>
+            <p class="year">2021</p>
+            <a class="link" href="https://rs.school/js/" title="RS School JS course">
+              <img
+                class="rss-logo"
+                src="/assets/svg/rs_school_js.svg"
+                alt="rsschool logo"
+              />
+            </a>
+          </div>
+        </footer>
+      </div>
+    </div>
+  </body>
+</html>
