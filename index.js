@@ -1,6 +1,20 @@
 /* Modedl */
 
 // --- Quiz classes
+
+class QuizFactory {
+  constructor(data) {
+    this.data = data;
+  }
+
+  createArtistsQuiz() {
+    return new ArtistsQuiz(this.data);
+  }
+  createPaintingQuiz() {
+    return new PaintingsQuiz(this.data);
+  }
+}
+
 class Task {
   constructor(taskInfo) {
     this.data = taskInfo;
@@ -56,10 +70,12 @@ class Quiz {
     this.tasks = null;
     this.data = data;
     this.quizProgress = null;
+    this.currentTask = 0;
   }
 
   resetProgress() {
-    this.quizProgress = new Array(10).fill(0);
+    this.currentTask = 0;
+    this.quizProgress = new Array(10).fill(-1);
   }
 
   generateNewQuiz(group) {
@@ -91,19 +107,6 @@ class Quiz {
     if (size === "box") {
       return `./assets/pic/img/${index}.webp`;
     }
-  }
-}
-
-class QuizFactory {
-  constructor(data) {
-    this.data = data;
-  }
-
-  createArtistsQuiz() {
-    return new ArtistsQuiz(this.data);
-  }
-  createPaintingQuiz() {
-    return new PaintingsQuiz(this.data);
   }
 }
 
@@ -333,29 +336,59 @@ class View {
     return content;
   }
 
-  createQuizPage() {
+  createQuizAPage(settings) {
     const content = document.createElement("div");
     content.id = "quiz-contest-page";
     content.innerHTML = `
       <header class="header">
         <nav class="navBar">
           <button class="uiBtn" id="back-btn">Назад</button>
-          <span class="timer">30</span>
-          <span class="taskCounter">&#8249;&#8249; 5 &#8250;&#8250;</span>
+          <span class="timer ${settings.options.timeLimitEnabled ? "" : "hidden"}
+            ">${settings.options.timeLimit}
+          </span>
+          <span class="taskCounter"></span>
         </nav>        
       </header>
-      <div class="progressBar">
-        <span class="bullet rightAnswer"></span>
-        <span class="bullet wrongAnswer"></span>
-        <span class="bullet rightAnswer"></span>
-        <span class="bullet wrongAnswer"></span>
-        <span class="bullet"></span>
-        <span class="bullet"></span>
-        <span class="bullet"></span>
-        <span class="bullet"></span>
-        <span class="bullet"></span>
-        <span class="bullet"></span>
-      </div>
+      <div class="progressBar"></div>
+      <main class="main">
+        <section class="taskCard" id="quiz-task-0">
+          <div class="taskQuestion-container">
+            <h3 class="taskQuestion">***</h3>
+          </div>
+          <div class="taskOptionImg-container">
+            <div id="option-img-0"></div>
+            <div id="option-img-1"></div>
+            <div id="option-img-2"></div>
+            <div id="option-img-3"></div>            
+          </div>          
+        </section>
+        <div class="overlay hidden"></div>
+        <div class="result-container hidden" id="quiz-task-result">
+          <div class="resultBadge failBadge"></div>
+          <img class="resultImg" src="../assets/pic/full/12full.webp" alt="Painting" />
+          <div class="paintingCaption">Девочка на шаре</div>
+          <div class="paintingAthor">Пабло Пикассо, 1905</div>
+          <button class="uiBtn">Продолжить</button>
+        </div>
+        <div id="quiz-result"></div>
+      </main>`;
+    return content;
+  }
+
+  createQuizPPage(settings) {
+    const content = document.createElement("div");
+    content.id = "quiz-contest-page";
+    content.innerHTML = `
+      <header class="header">
+        <nav class="navBar">
+          <button class="uiBtn" id="back-btn">Назад</button>
+          <span class="timer ${settings.options.timeLimitEnabled ? "" : "hidden"}
+            ">${settings.options.timeLimit}
+          </span>
+          <span class="taskCounter"></span>
+        </nav>        
+      </header>
+      <div class="progressBar"></div>
       <main class="main">
         <section class="taskCard" id="quiz-task-0">
           <div class="taskQuestion-container">
@@ -365,10 +398,10 @@ class View {
             <img class="taskImg" src="../assets/pic/img/2.webp" alt="Painting" />
           </div>
           <div class="taskBtn-container">
-            <button class="taskBtn">Карл Юнг</button>
-            <button class="taskBtn">Жак Лакан</button>
-            <button class="taskBtn">Зигмунд Фрейд</button>
-            <button class="taskBtn">Жан Бодрияр</button>
+            <button class="taskBtn" id="option-btn-0"></button>
+            <button class="taskBtn" id="option-btn-1"></button>
+            <button class="taskBtn" id="option-btn-2"></button>
+            <button class="taskBtn" id="option-btn-3"></button>
           </div>
         </section>
         <div class="overlay hidden"></div>
@@ -453,6 +486,7 @@ class AppController {
     this.render(pageNode);
   };
 
+  // Artists quiz Groups page controller
   getAGroupsPage = () => {
     const group = (element) => +element.id.split("-")[2];
     // Create quiz instance
@@ -465,7 +499,7 @@ class AppController {
     const cardsCollection = pageNode.getElementsByClassName("groupCard");
     for (let card of cardsCollection) {
       card.addEventListener("click", (e) => {
-        this.getQuizPaintings(group(e.currentTarget)); // ----------------------------------
+        this.getQuizArtists(group(e.currentTarget));
       });
       // Add cards background
       card.style.backgroundImage = `url(/assets/pic/img/${group(card) * 10 + 4}.webp)`;
@@ -483,6 +517,7 @@ class AppController {
     this.render(pageNode);
   };
 
+  // Paintings quiz Groups page controller
   getPGroupsPage = () => {
     const group = (element) => +element.id.split("-")[2];
     // Create quiz instance
@@ -513,15 +548,107 @@ class AppController {
     this.render(pageNode);
   };
 
-  getQuizPaintings = (groupIndex) => {
+  // Artists quiz page controller
+  getQuizArtists = (groupIndex) => {
+    // Create new quiz model
+    this.quiz.generateNewQuiz(groupIndex);
     // Create page basic layout
-    const pageNode = this.view.createQuizPage();
+    const pageNode = this.view.createQuizAPage(this.settings);
     // Add page events
     const btnBack = pageNode.querySelector("#back-btn");
-    btnBack.addEventListener("click", this.getPGroupsPage);
+    btnBack.addEventListener("click", this.getAGroupsPage);
+    // --- Task option img click event
+    for (let i = 0; i < 4; i++) {
+      const container = `#option-img-${i}`;
+      pageNode.querySelector(container).addEventListener("click", (e) => {
+        console.log(e.target); // --------------------------------------------
+      });
+    }
+    // Initial task values
+    this.setupArtistsQuiz(pageNode);
     //
     this.render(pageNode);
   };
+
+  setupArtistsQuiz(node) {
+    // Current task number
+    node.querySelector(".taskCounter").textContent = this.quiz.currentTask + 1;
+    // Progress bar update
+    let progress = "";
+    this.quiz.quizProgress.forEach((i) => {
+      if (i === -1) {
+        progress += `<span class="bullet"></span>`;
+      } else if (i === 0) {
+        progress += `<span class="bullet wrongAnswer"></span>`;
+      } else if (i === 1) {
+        progress += `<span class="bullet rightAnswer"></span>`;
+      }
+    });
+    node.querySelector(".progressBar").innerHTML = progress;
+    // Task Question
+    node.querySelector(".taskQuestion").innerHTML = this.quiz.getTaskQuestion(
+      this.quiz.currentTask
+    );
+    // Task Options
+    const options = this.quiz.getTaskOptions(this.quiz.currentTask);
+    options.forEach((i, n) => {
+      const [id, url] = i.split("::");
+      const container = `#option-img-${n}`;
+      node.querySelector(container).innerHTML = `
+        <img class="taskImg" data="${id}" src=".${url}" alt="Painting">`;
+    });
+  }
+
+  // Paintings quiz page controller
+  getQuizPaintings = (groupIndex) => {
+    // Create new quiz model
+    this.quiz.generateNewQuiz(groupIndex);
+    // Create page basic layout
+    const pageNode = this.view.createQuizPPage(this.settings);
+    // Add page events
+    const btnBack = pageNode.querySelector("#back-btn");
+    btnBack.addEventListener("click", this.getPGroupsPage);
+    // --- Task option btn click event
+    for (let i = 0; i < 4; i++) {
+      const container = `#option-btn-${i}`;
+      pageNode.querySelector(container).addEventListener("click", (e) => {
+        console.log(e.target); // --------------------------------------------
+      });
+    }
+    // Initial task values
+    this.setupPaintingsQuiz(pageNode);
+    //
+    this.render(pageNode);
+  };
+
+  setupPaintingsQuiz(node) {
+    // Current task number
+    node.querySelector(".taskCounter").textContent = this.quiz.currentTask + 1;
+    // Progress bar update
+    let progress = "";
+    this.quiz.quizProgress.forEach((i) => {
+      if (i === -1) {
+        progress += `<span class="bullet"></span>`;
+      } else if (i === 0) {
+        progress += `<span class="bullet wrongAnswer"></span>`;
+      } else if (i === 1) {
+        progress += `<span class="bullet rightAnswer"></span>`;
+      }
+    });
+    node.querySelector(".progressBar").innerHTML = progress;
+    // Task Painting
+    const taskImg = this.quiz.getTaskImg(this.quiz.currentTask);
+    node.querySelector(".taskImg").src = taskImg;
+    // Task Options
+    const options = this.quiz.getTaskOptions(this.quiz.currentTask);
+    options.forEach((i, n) => {
+      const [id, name] = i.split("::");
+      const container = `#option-btn-${n}`;
+      const optionBtn = node.querySelector(container);
+      optionBtn.data = id;
+      optionBtn.textContent = name;
+    });
+  }
 
   getSettingsPage = () => {
     // Create page basic layout

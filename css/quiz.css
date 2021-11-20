@@ -227,6 +227,7 @@ button {
   justify-content: space-between;
   background-repeat: no-repeat;
   background-position: 50% 20%;
+  cursor: pointer;
 }
 
 .bwCard {
@@ -359,7 +360,7 @@ button {
   line-height: 3rem;
   border: none;
   color: black;
-  padding: 10px 30px;
+  padding: 10px;
 }
 
 .taskBtn:hover {
@@ -368,6 +369,13 @@ button {
 
 .taskBtn:active {
   background-color: #ffee00;
+}
+
+.taskOptionImg-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 5px;
 }
 
 /* Overlay */
