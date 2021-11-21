@@ -33,7 +33,7 @@ class Task {
     return this.data.name;
   }
 
-  getYear() {
+  getPaintingYear() {
     return this.data.year;
   }
 
@@ -380,9 +380,16 @@ class View {
           <img class="resultImg" src="../assets/pic/full/12full.webp" alt="Painting" />
           <div class="paintingCaption">Девочка на шаре</div>
           <div class="paintingAthor">Пабло Пикассо, 1905</div>
-          <button class="uiBtn">Продолжить</button>
+          <button class="uiBtn" id="next-task">Продолжить</button>
         </div>
-        <div id="quiz-result"></div>
+        <div class="result-container hidden" id="quiz-result">
+          <div class="taskQuestion">Поздравляем!</div>
+          <div class="taskQuestion">Ваш результат</div>
+          <div class="quizResultBadge">
+            <div class="quizScore">0</div>
+          </div>
+          <button class="uiBtn" id="finish-quiz">Ок</button>
+        </div>
       </main>`;
     return content;
   }
@@ -422,22 +429,16 @@ class View {
           <img class="resultImg" src="../assets/pic/full/12full.webp" alt="Painting" />
           <div class="paintingCaption">Девочка на шаре</div>
           <div class="paintingAthor">Пабло Пикассо, 1905</div>
-          <button class="uiBtn">Продолжить</button>
+          <button class="uiBtn" id="next-task">Продолжить</button>
         </div>
-        <div id="quiz-result"></div>
-      </main>`;
-    return content;
-  }
-
-  createQuizResultPage() {
-    const content = document.createElement("div");
-    content.id = "quiz-result-page";
-    content.innerHTML = `
-      <header>
-        
-      </header>
-      <main>
-
+        <div class="result-container hidden" id="quiz-result">
+          <div class="taskQuestion">Поздравляем!</div>
+          <div class="taskQuestion">Ваш результат</div>
+          <div class="quizResultBadge">
+            <div class="quizScore">0</div>
+          </div>
+          <button class="uiBtn" id="finish-quiz">Ок</button>
+        </div>
       </main>`;
     return content;
   }
@@ -569,13 +570,78 @@ class AppController {
     // Add page events
     const btnBack = pageNode.querySelector("#back-btn");
     btnBack.addEventListener("click", this.getAGroupsPage);
-    // --- Task option img click event
+    // - Task option img click event
     for (let i = 0; i < 4; i++) {
       const container = `#option-img-${i}`;
       pageNode.querySelector(container).addEventListener("click", (e) => {
-        console.log(e.target); // --------------------------------------------
+        // Check Task answer -------------------------------------------------------------------- function
+        const userGuess = e.target.id;
+        const isRightAnswer = this.quiz.checkUserGuess(this.quiz.currentTask, userGuess);
+        console.log(e.target.id);
+        if (isRightAnswer) {
+          // Add success badge to the painting
+          document.querySelector(".resultBadge").classList.remove("failBadge");
+          document.querySelector(".resultBadge").classList.add("successBadge");
+        } else {
+          // Add fail badge to the painting
+          document.querySelector(".resultBadge").classList.remove("successBadge");
+          document.querySelector(".resultBadge").classList.add("failBadge");
+        }
+        // Show task answer popup
+        document.querySelector(".overlay").classList.remove("hidden");
+        document.querySelector("#quiz-task-result").classList.remove("hidden");
       });
     }
+    // ***************************************************************************************************************
+    // - Task continue btn click event
+    const btnNext = pageNode.querySelector("#next-task");
+    btnNext.addEventListener("click", () => {
+      // Update quiz model
+      // - Next task
+      this.quiz.currentTask += 1;
+      // Check Quiz end condition
+      if (this.quiz.currentTask > 9) {
+        // Invoke Quiz results
+        // Progress bar update --------------------------------------------- function
+        let progress = "";
+        this.quiz.quizProgress.forEach((i) => {
+          if (i === -1) {
+            progress += `<span class="bullet"></span>`;
+          } else if (i === 0) {
+            progress += `<span class="bullet wrongAnswer"></span>`;
+          } else if (i === 1) {
+            progress += `<span class="bullet rightAnswer"></span>`;
+          }
+        });
+        document.querySelector(".progressBar").innerHTML = progress;
+        // - Comtpute quiz result
+        const quizResult = this.quiz.quizProgress.reduce(
+          (acc, i) => (i === 1 ? acc + i : acc),
+          0
+        );
+        document.querySelector(".quizScore").textContent = quizResult;
+        // Save quiz result
+        this.results.setGroupResult(groupIndex, quizResult); // ------------------------- shift
+        // - Show golden trophy
+        if (quizResult === 10) {
+          const goldenTrophy = `url(/assets/svg/trophy-badge-10.svg)`;
+          document.querySelector(".quizResultBadge").style.backgroundImage = goldenTrophy;
+        }
+        // Show Quiz results
+        document.querySelector(".overlay").classList.remove("hidden");
+        document.querySelector("#quiz-task-result").classList.add("hidden");
+        document.querySelector("#quiz-result").classList.remove("hidden");
+      } else {
+        // Update page with a next task
+        this.setupArtistsQuiz(document);
+        document.querySelector(".overlay").classList.add("hidden");
+        document.querySelector("#quiz-task-result").classList.add("hidden");
+      }
+    });
+    // - Quiz finish button
+    const finishBtn = pageNode.querySelector("#finish-quiz");
+    finishBtn.addEventListener("click", this.getAGroupsPage);
+    // ***************************************************************************************************************
     // Initial task values
     this.setupArtistsQuiz(pageNode);
     //
@@ -607,8 +673,18 @@ class AppController {
       const [id, url] = i.split("::");
       const container = `#option-img-${n}`;
       node.querySelector(container).innerHTML = `
-        <img class="taskImg" data="${id}" src=".${url}" alt="Painting">`;
+        <img class="taskImg" id="${id}" src=".${url}" alt="Painting">`;
     });
+    // Result popup
+    const paintingImgURL = this.quiz.tasks.task[this.quiz.currentTask].getImgNum();
+    node.querySelector(".resultImg").src = this.quiz.getImgURL(paintingImgURL, "full");
+    const paintingName = this.quiz.tasks.task[this.quiz.currentTask].getPaintingName();
+    node.querySelector(".paintingCaption").textContent = `${paintingName}`;
+    const paintingYear = this.quiz.tasks.task[this.quiz.currentTask].getPaintingYear();
+    const paintingAuthor = this.quiz.tasks.task[this.quiz.currentTask].getAuthor();
+    node.querySelector(
+      ".paintingAthor"
+    ).textContent = `${paintingAuthor}, ${paintingYear}`;
   }
 
   // Paintings quiz page controller
@@ -620,13 +696,75 @@ class AppController {
     // Add page events
     const btnBack = pageNode.querySelector("#back-btn");
     btnBack.addEventListener("click", this.getPGroupsPage);
-    // --- Task option btn click event
+    // - Task option btn click event
     for (let i = 0; i < 4; i++) {
       const container = `#option-btn-${i}`;
       pageNode.querySelector(container).addEventListener("click", (e) => {
-        console.log(e.target); // --------------------------------------------
+        // Check Task answer
+        const userGuess = e.target.data;
+        const isRightAnswer = this.quiz.checkUserGuess(this.quiz.currentTask, userGuess);
+        if (isRightAnswer) {
+          // Add success badge to the painting
+          document.querySelector(".resultBadge").classList.remove("failBadge");
+          document.querySelector(".resultBadge").classList.add("successBadge");
+        } else {
+          // Add fail badge to the painting
+          document.querySelector(".resultBadge").classList.remove("successBadge");
+          document.querySelector(".resultBadge").classList.add("failBadge");
+        }
+        // Show task answer popup
+        document.querySelector(".overlay").classList.remove("hidden");
+        document.querySelector("#quiz-task-result").classList.remove("hidden");
       });
     }
+    // - Task continue btn click event
+    const btnNext = pageNode.querySelector("#next-task");
+    btnNext.addEventListener("click", () => {
+      // Update quiz model
+      // - Next task
+      this.quiz.currentTask += 1;
+      // Check Quiz end condition
+      if (this.quiz.currentTask > 9) {
+        // Invoke Quiz results
+        // Progress bar update --------------------------------------------- function
+        let progress = "";
+        this.quiz.quizProgress.forEach((i) => {
+          if (i === -1) {
+            progress += `<span class="bullet"></span>`;
+          } else if (i === 0) {
+            progress += `<span class="bullet wrongAnswer"></span>`;
+          } else if (i === 1) {
+            progress += `<span class="bullet rightAnswer"></span>`;
+          }
+        });
+        document.querySelector(".progressBar").innerHTML = progress;
+        // - Comtpute quiz result
+        const quizResult = this.quiz.quizProgress.reduce(
+          (acc, i) => (i === 1 ? acc + i : acc),
+          0
+        );
+        document.querySelector(".quizScore").textContent = quizResult;
+        // Save quiz result
+        this.results.setGroupResult(groupIndex + 12, quizResult);
+        // - Show golden trophy
+        if (quizResult === 10) {
+          const goldenTrophy = `url(/assets/svg/trophy-badge-10.svg)`;
+          document.querySelector(".quizResultBadge").style.backgroundImage = goldenTrophy;
+        }
+        // Show Quiz results
+        document.querySelector(".overlay").classList.remove("hidden");
+        document.querySelector("#quiz-task-result").classList.add("hidden");
+        document.querySelector("#quiz-result").classList.remove("hidden");
+      } else {
+        // Update page with a next task
+        this.setupPaintingsQuiz(document);
+        document.querySelector(".overlay").classList.add("hidden");
+        document.querySelector("#quiz-task-result").classList.add("hidden");
+      }
+    });
+    // - Quiz finish button
+    const finishBtn = pageNode.querySelector("#finish-quiz");
+    finishBtn.addEventListener("click", this.getPGroupsPage);
     // Initial task values
     this.setupPaintingsQuiz(pageNode);
     //
@@ -660,6 +798,16 @@ class AppController {
       optionBtn.data = id;
       optionBtn.textContent = name;
     });
+    // Result popup
+    const paintingImgURL = this.quiz.tasks.task[this.quiz.currentTask].getImgNum();
+    node.querySelector(".resultImg").src = this.quiz.getImgURL(paintingImgURL, "full");
+    const paintingName = this.quiz.tasks.task[this.quiz.currentTask].getPaintingName();
+    node.querySelector(".paintingCaption").textContent = `${paintingName}`;
+    const paintingYear = this.quiz.tasks.task[this.quiz.currentTask].getPaintingYear();
+    const paintingAuthor = this.quiz.tasks.task[this.quiz.currentTask].getAuthor();
+    node.querySelector(
+      ".paintingAthor"
+    ).textContent = `${paintingAuthor}, ${paintingYear}`;
   }
 
   getSettingsPage = () => {

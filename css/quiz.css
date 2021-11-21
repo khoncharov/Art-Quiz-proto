@@ -378,6 +378,11 @@ button {
   gap: 5px;
 }
 
+.taskOptionImg-container div {
+  display: flex;
+  cursor: pointer;
+}
+
 /* Overlay */
 
 .overlay {
@@ -386,9 +391,10 @@ button {
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.8);
+  background-color: rgba(0, 0, 0, 0.5);
 }
 
+/* ------------ */
 /* Task results */
 
 .result-container {
@@ -400,6 +406,7 @@ button {
   transform: translate(-50%, -50%);
   background-color: white;
   padding: 5px;
+  border-radius: 5px;
 }
 
 /* Result badge */
@@ -415,13 +422,14 @@ button {
   font-size: 4rem;
   font-weight: 800;
   text-align: center;
-  filter: opacity(0.7);
-  line-height: 4rem;
+  /* filter: opacity(0.8); */
+  line-height: 3.5rem;
+  border: 2px solid white;
 }
 
 .successBadge {
-  font-size: 3.7rem;
-  line-height: 3.5rem;
+  font-size: 3.5rem;
+  line-height: 3.2rem;
   background-color: turquoise;
 }
 
@@ -440,6 +448,9 @@ button {
 /* Result page image */
 
 .resultImg {
+  max-height: 60vh;
+  display: block;
+  margin: 0 auto;
   object-fit: scale-down;
 }
 
@@ -470,6 +481,28 @@ button {
   text-align: center;
 }
 
+/* ----------- */
+/* Quiz result */
+
+.quizResultBadge {
+  margin: 20px auto;
+  height: 150px;
+  background-image: url("/assets/svg/trophy-badge-0.svg");
+  background-size: 60%;
+  background-repeat: no-repeat;
+  background-position: center;
+  display: flex;
+  justify-content: center;
+  transition: 2s ease-in-out;
+}
+
+.quizScore {
+  font-size: 7rem;
+  font-weight: 600;
+  color: crimson;
+}
+
+/* ------------- */
 /* Media queries */
 @media screen and (min-width: 500px) {
   #app {

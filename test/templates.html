@@ -66,7 +66,7 @@
     </div>
     <div id="quiz-result" style="display: none"></div>
     <!-- HOME PAGE -->
-    <div id="app">
+    <div id="app" style="display: none">
       <div id="home-page">
         <header>
           <h1 class="logo">Art quiz</h1>
@@ -93,6 +93,52 @@
             </a>
           </div>
         </footer>
+      </div>
+    </div>
+
+    <!-- Painting Quiz page -->
+    <div id="app">
+      <div id="quiz-contest-page">
+        <header class="header">
+          <nav class="navBar">
+            <button class="uiBtn" id="back-btn">Назад</button>
+            <span class="timer">30</span>
+            <span class="taskCounter">1</span>
+          </nav>
+        </header>
+        <div class="progressBar">1 0 1 0 1 0 1 - -</div>
+        <main class="main">
+          <section class="taskCard" id="quiz-task-0">
+            <div class="taskQuestion-container">
+              <h3 class="taskQuestion">Кто автор этой картины?</h3>
+            </div>
+            <div class="taskImg-container">
+              <img class="taskImg" src="../assets/pic/img/2.webp" alt="Painting" />
+            </div>
+            <div class="taskBtn-container">
+              <button class="taskBtn" id="option-btn-0">1</button>
+              <button class="taskBtn" id="option-btn-1">2</button>
+              <button class="taskBtn" id="option-btn-2">3</button>
+              <button class="taskBtn" id="option-btn-3">4</button>
+            </div>
+          </section>
+          <div class="overlay"></div>
+          <div class="result-container hidden" id="quiz-task-result">
+            <div class="resultBadge failBadge"></div>
+            <img class="resultImg" src="../assets/pic/full/12full.webp" alt="Painting" />
+            <div class="paintingCaption">Девочка на шаре</div>
+            <div class="paintingAthor">Пабло Пикассо, 1905</div>
+            <button class="uiBtn" id="next-task">Продолжить</button>
+          </div>
+          <div class="result-container" id="quiz-result">
+            <div class="taskQuestion">Поздравляем!</div>
+            <div class="taskQuestion">Ваш результат</div>
+            <div class="quizResultBadge">
+              <div class="quizScore">0</div>
+            </div>
+            <button class="uiBtn" id="finish-quiz">Ок</button>
+          </div>
+        </main>
       </div>
     </div>
   </body>
