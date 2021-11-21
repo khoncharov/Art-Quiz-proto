@@ -1,4 +1,4 @@
-/* Modedl */
+/* Model */
 
 // --- Quiz classes
 
@@ -590,9 +590,15 @@ class AppController {
     // Update sounds
     this.mutePage(pageNode, !this.settings.options.soundsEnabled);
     this.changePageVolume(pageNode, this.settings.options.volume);
+    // Initial task values
+    this.setupArtistsQuiz(pageNode);
+    //
     // Add page events
+    //
+    // - Back btn click Event
     const btnBack = pageNode.querySelector("#back-btn");
     btnBack.addEventListener("click", this.getAGroupsPage);
+    //
     // - Task option img click event
     for (let i = 0; i < 4; i++) {
       const container = `#option-img-${i}`;
@@ -619,8 +625,8 @@ class AppController {
         document.querySelector("#quiz-task-result").classList.remove("hidden");
       });
     }
-    // ***************************************************************************************************************
-    // - Task continue btn click event
+    //
+    // - Next Task btn click event
     const btnNext = pageNode.querySelector("#next-task");
     btnNext.addEventListener("click", () => {
       // Update quiz model
@@ -631,7 +637,7 @@ class AppController {
         // Invoke Quiz results
         // Quiz end sound
         this.playSound(2);
-        // Progress bar update --------------------------------------------- function
+        // Update quiz progress
         let progress = "";
         this.quiz.quizProgress.forEach((i) => {
           if (i === -1) {
@@ -667,12 +673,10 @@ class AppController {
         document.querySelector("#quiz-task-result").classList.add("hidden");
       }
     });
-    // - Quiz finish button
+    //
+    // - Finish Quiz button click Event
     const finishBtn = pageNode.querySelector("#finish-quiz");
     finishBtn.addEventListener("click", this.getAGroupsPage);
-    // ***************************************************************************************************************
-    // Initial task values
-    this.setupArtistsQuiz(pageNode);
     //
     this.render(pageNode);
   };
@@ -725,10 +729,16 @@ class AppController {
     // Update sounds
     this.mutePage(pageNode, !this.settings.options.soundsEnabled);
     this.changePageVolume(pageNode, this.settings.options.volume);
+    // Initial task values
+    this.setupPaintingsQuiz(pageNode);
+    //
     // Add page events
+    //
+    // - Back btn click Event
     const btnBack = pageNode.querySelector("#back-btn");
     btnBack.addEventListener("click", this.getPGroupsPage);
-    // - Task option btn click event
+    //
+    // - Task option img click event
     for (let i = 0; i < 4; i++) {
       const container = `#option-btn-${i}`;
       pageNode.querySelector(container).addEventListener("click", (e) => {
@@ -753,7 +763,8 @@ class AppController {
         document.querySelector("#quiz-task-result").classList.remove("hidden");
       });
     }
-    // - Task continue btn click event
+    //
+    // - Next Task btn click event
     const btnNext = pageNode.querySelector("#next-task");
     btnNext.addEventListener("click", () => {
       // Update quiz model
@@ -800,11 +811,10 @@ class AppController {
         document.querySelector("#quiz-task-result").classList.add("hidden");
       }
     });
-    // - Quiz finish button
+    //
+    // - Finish Quiz button click Event
     const finishBtn = pageNode.querySelector("#finish-quiz");
     finishBtn.addEventListener("click", this.getPGroupsPage);
-    // Initial task values
-    this.setupPaintingsQuiz(pageNode);
     //
     this.render(pageNode);
   };
@@ -855,8 +865,10 @@ class AppController {
     // Update sounds
     this.mutePage(pageNode, !this.settings.options.soundsEnabled);
     this.changePageVolume(pageNode, this.settings.options.volume);
-
+    //
     // Add page events
+    //
+    // - Enable sounds checkbox click event
     const soundsEnabled = pageNode.querySelector("#sounds-enabled");
     soundsEnabled.addEventListener("click", (e) => {
       this.mutePage(document, !e.target.checked);
@@ -864,12 +876,15 @@ class AppController {
         this.playSound(0);
       }
     });
+    //
+    // - Volume level change event
     const volume = pageNode.querySelector("#volume-level");
     volume.addEventListener("change", (e) => {
       this.changePageVolume(document, e.target.value);
       this.playSound(1);
     });
-
+    //
+    // - Time limit btn click event
     const stepDownBtn = pageNode.querySelector("#step-down-btn");
     stepDownBtn.addEventListener("click", (e) => {
       e.target.nextElementSibling.stepDown();
@@ -880,15 +895,20 @@ class AppController {
       e.target.previousElementSibling.stepUp();
       this.playSound(1);
     });
-
+    //
+    // - Enable time limit checkbox click event
     const timeLimitEnabled = pageNode.querySelector("#time-limit-enabled");
     timeLimitEnabled.addEventListener("click", (e) => {
       if (e.target.checked) {
         this.playSound(0);
       }
     });
+    //
+    // - Home btn click event
     const btnHome = pageNode.querySelector("#home-btn");
     btnHome.addEventListener("click", this.getHomePage);
+    //
+    // - Save settings btn click event
     const btnSave = pageNode.querySelector("#save-settings-btn");
     btnSave.addEventListener("click", () => {
       this.settings.options = {
@@ -898,6 +918,8 @@ class AppController {
         timeLimit: document.querySelector("#time-limit").value,
       };
     });
+    //
+    // - Return default settings btn click event
     const btnDefault = pageNode.querySelector("#default-settings-btn");
     btnDefault.addEventListener("click", () => {
       document.querySelector("#sounds-enabled").checked = false;
