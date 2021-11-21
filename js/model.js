@@ -98,7 +98,7 @@ class Quiz {
   }
 }
 
-export class ArtistsQuiz extends Quiz {
+class ArtistsQuiz extends Quiz {
   constructor(data) {
     super(data);
   }
@@ -128,7 +128,7 @@ export class ArtistsQuiz extends Quiz {
   }
 }
 
-export class PaintingsQuiz extends Quiz {
+class PaintingsQuiz extends Quiz {
   constructor(data) {
     super(data);
   }

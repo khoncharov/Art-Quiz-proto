@@ -141,26 +141,8 @@ export class AppController {
     for (let i = 0; i < 4; i++) {
       const container = `#option-img-${i}`;
       pageNode.querySelector(container).addEventListener("click", (e) => {
-        // Check Task answer -------------------------------------------------------------------- function
         const userGuess = e.target.id;
-        const isRightAnswer = this.quiz.checkUserGuess(this.quiz.currentTask, userGuess);
-        console.log(e.target.id);
-        if (isRightAnswer) {
-          // Add success badge to the painting
-          document.querySelector(".resultBadge").classList.remove("failBadge");
-          document.querySelector(".resultBadge").classList.add("successBadge");
-          // Play sound
-          this.playSound(1);
-        } else {
-          // Add fail badge to the painting
-          document.querySelector(".resultBadge").classList.remove("successBadge");
-          document.querySelector(".resultBadge").classList.add("failBadge");
-          // Play sound
-          this.playSound(0);
-        }
-        // Show task answer popup
-        document.querySelector(".overlay").classList.remove("hidden");
-        document.querySelector("#quiz-task-result").classList.remove("hidden");
+        this.showTaskAnswerCard(userGuess);
       });
     }
     //
@@ -175,7 +157,7 @@ export class AppController {
         // Invoke Quiz results
         // Quiz end sound
         this.playSound(2);
-        // Update quiz progress
+        // Progress bar update --------------------------------------------- function
         let progress = "";
         this.quiz.quizProgress.forEach((i) => {
           if (i === -1) {
@@ -217,6 +199,26 @@ export class AppController {
     finishBtn.addEventListener("click", this.getAGroupsPage);
     //
     this.render(pageNode);
+  };
+
+  showTaskAnswerCard = (userGuess) => {
+    const isRightAnswer = this.quiz.checkUserGuess(this.quiz.currentTask, userGuess);
+    if (isRightAnswer) {
+      // Add success badge to the painting
+      document.querySelector(".resultBadge").classList.remove("failBadge");
+      document.querySelector(".resultBadge").classList.add("successBadge");
+      // Play sound
+      this.playSound(1);
+    } else {
+      // Add fail badge to the painting
+      document.querySelector(".resultBadge").classList.remove("successBadge");
+      document.querySelector(".resultBadge").classList.add("failBadge");
+      // Play sound
+      this.playSound(0);
+    }
+    // Show task answer popup
+    document.querySelector(".overlay").classList.remove("hidden");
+    document.querySelector("#quiz-task-result").classList.remove("hidden");
   };
 
   setupArtistsQuiz(node) {
@@ -282,23 +284,7 @@ export class AppController {
       pageNode.querySelector(container).addEventListener("click", (e) => {
         // Check Task answer
         const userGuess = e.target.data;
-        const isRightAnswer = this.quiz.checkUserGuess(this.quiz.currentTask, userGuess);
-        if (isRightAnswer) {
-          // Add success badge to the painting
-          document.querySelector(".resultBadge").classList.remove("failBadge");
-          document.querySelector(".resultBadge").classList.add("successBadge");
-          // Play sound
-          this.playSound(1);
-        } else {
-          // Add fail badge to the painting
-          document.querySelector(".resultBadge").classList.remove("successBadge");
-          document.querySelector(".resultBadge").classList.add("failBadge");
-          // Play sound
-          this.playSound(0);
-        }
-        // Show task answer popup
-        document.querySelector(".overlay").classList.remove("hidden");
-        document.querySelector("#quiz-task-result").classList.remove("hidden");
+        this.showTaskAnswerCard(userGuess);
       });
     }
     //
