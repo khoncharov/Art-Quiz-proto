@@ -50,69 +50,66 @@ export class AppController {
     const btnSettings = pageNode.querySelector("#settings-btn");
     btnSettings.addEventListener("click", this.getSettingsPage);
     const btnArtistsQuiz = pageNode.querySelector("#artists-quiz-btn");
-    btnArtistsQuiz.addEventListener("click", this.getAGroupsPage);
+    btnArtistsQuiz.addEventListener("click", () => {
+      this.getGroupsPage("artists");
+    });
     const btnPaintingsQuiz = pageNode.querySelector("#paintings-quiz-btn");
-    btnPaintingsQuiz.addEventListener("click", this.getPGroupsPage);
+    btnPaintingsQuiz.addEventListener("click", () => {
+      this.getGroupsPage("paintings");
+    });
     //
     this.render(pageNode);
   };
 
-  // Artists quiz Groups page controller
-  getAGroupsPage = () => {
+  // Quiz Groups page controller
+  getGroupsPage = (type) => {
     const group = (element) => +element.id.split("-")[2];
-    // Create quiz instance
-    this.quiz = this.quizFactory.createArtistsQuiz();
-    // Create page basic layout
-    const pageNode = this.view.createGroupsPage("artists");
-    // Add page events
-    const btnHome = pageNode.querySelector("#home-page-btn");
-    btnHome.addEventListener("click", this.getHomePage);
-    const cardsCollection = pageNode.getElementsByClassName("groupCard");
-    for (let card of cardsCollection) {
-      card.addEventListener("click", (e) => {
-        this.getQuizArtists(group(e.currentTarget));
-      });
-      // Add cards background
-      card.style.backgroundImage = `url(/assets/pic/img/${group(card) * 10 + 4}.webp)`;
-      // Add results on card
-      const delta = 0;
-      const groupResult = this.results.getGroupResult(group(card) + delta);
+    const addGroupResult = (groupCard, displacement) => {
+      const groupResult = this.results.getGroupResult(group(groupCard) + displacement);
       if (groupResult !== -1) {
-        card.classList.remove("bwCard");
-        const score = card.lastElementChild;
+        groupCard.classList.remove("bwCard");
+        const score = groupCard.lastElementChild;
         score.classList.remove("hidden");
         score.textContent = `${groupResult}/10`;
       }
-    }
-    //
-    this.render(pageNode);
-  };
-
-  // Paintings quiz Groups page controller
-  getPGroupsPage = () => {
-    const group = (element) => +element.id.split("-")[2];
+    };
     // Create quiz instance
-    this.quiz = this.quizFactory.createPaintingQuiz();
+    if (type === "artists") {
+      this.quiz = this.quizFactory.createArtistsQuiz();
+    } else if (type === "paintings") {
+      this.quiz = this.quizFactory.createPaintingQuiz();
+    }
     // Create page basic layout
-    const pageNode = this.view.createGroupsPage("paintings");
+    const pageNode = this.view.createGroupsPage(type);
+    //
     // Add page events
+    // - Home page btn event
     const btnHome = pageNode.querySelector("#home-page-btn");
     btnHome.addEventListener("click", this.getHomePage);
+    // - Cards click event
     const cardsCollection = pageNode.getElementsByClassName("groupCard");
     for (let card of cardsCollection) {
-      card.addEventListener("click", (e) => {
-        this.getQuizPaintings(group(e.currentTarget));
-      });
-      // Add cards background
-      card.style.backgroundImage = `url(/assets/pic/img/${group(card) * 10 + 124}.webp)`;
-      // Add results on card
-      const delta = 12;
-      const groupResult = this.results.getGroupResult(group(card) + delta);
-      if (groupResult !== -1) {
-        card.classList.remove("bwCard");
-        const score = card.lastElementChild;
-        score.classList.remove("hidden");
-        score.textContent = `${groupResult}/10`;
+      // -- Card
+      if (type === "artists") {
+        card.addEventListener("click", (e) => {
+          this.getQuizArtists(group(e.currentTarget));
+        });
+        // -- Add cards background
+        card.style.backgroundImage = `url(/assets/pic/img/${group(card) * 10 + 4}.webp)`;
+        // -- Add results on card
+        const displacement = 0; // Shift for resulting array
+        addGroupResult(card, displacement);
+      } else if (type === "paintings") {
+        card.addEventListener("click", (e) => {
+          this.getQuizPaintings(group(e.currentTarget));
+        });
+        // Add cards background
+        card.style.backgroundImage = `url(/assets/pic/img/${
+          group(card) * 10 + 124
+        }.webp)`;
+        // Add results on card
+        const displacement = 12; // Shift for resulting array
+        addGroupResult(card, displacement);
       }
     }
     //
@@ -135,7 +132,9 @@ export class AppController {
     //
     // - Back btn click Event
     const btnBack = pageNode.querySelector("#back-btn");
-    btnBack.addEventListener("click", this.getAGroupsPage);
+    btnBack.addEventListener("click", () => {
+      this.getGroupsPage("artists");
+    });
     //
     // - Task option img click event
     for (let i = 0; i < 4; i++) {
@@ -186,7 +185,9 @@ export class AppController {
     //
     // - Finish Quiz button click Event
     const finishBtn = pageNode.querySelector("#finish-quiz");
-    finishBtn.addEventListener("click", this.getAGroupsPage);
+    finishBtn.addEventListener("click", () => {
+      this.getGroupsPage("artists");
+    });
     //
     this.render(pageNode);
   };
@@ -270,7 +271,9 @@ export class AppController {
     //
     // - Back btn click Event
     const btnBack = pageNode.querySelector("#back-btn");
-    btnBack.addEventListener("click", this.getPGroupsPage);
+    btnBack.addEventListener("click", () => {
+      this.getGroupsPage("paintings");
+    });
     //
     // - Task option img click event
     for (let i = 0; i < 4; i++) {
@@ -322,7 +325,9 @@ export class AppController {
     //
     // - Finish Quiz button click Event
     const finishBtn = pageNode.querySelector("#finish-quiz");
-    finishBtn.addEventListener("click", this.getPGroupsPage);
+    finishBtn.addEventListener("click", () => {
+      this.getGroupsPage("paintings");
+    });
     //
     this.render(pageNode);
   };
