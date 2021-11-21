@@ -14,17 +14,16 @@ export class AppController {
     this.results = new QuizResults();
   }
 
-  init() {
-    fetch("./data/db.json")
-      .then((res) => res.json())
-      .then((data) => {
-        this.quizFactory = new QuizFactory(data);
-        this.preloadGroupCovers();
-        this.getHomePage();
-      })
-      .catch((err) => {
-        console.error(err);
-      });
+  async init() {
+    try {
+      const res = await fetch("./data/db.json");
+      const data = await res.json();
+      this.quizFactory = new QuizFactory(data);
+      this.preloadGroupCovers();
+      this.getHomePage();
+    } catch (err) {
+      console.error(err);
+    }
   }
 
   render(pageNode) {
