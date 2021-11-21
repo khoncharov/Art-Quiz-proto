@@ -174,7 +174,7 @@ export class View {
           <div class="quizResultBadge">
             <div class="quizScore">0</div>
           </div>
-          <button class="uiBtn" id="finish-quiz">Ок</button>
+          <button class="uiBtn" id="finish-quiz">Продолжить</button>
         </div>
         
         <audio preload="auto">
@@ -233,7 +233,7 @@ export class View {
           <div class="quizResultBadge">
             <div class="quizScore">0</div>
           </div>
-          <button class="uiBtn" id="finish-quiz">Ок</button>
+          <button class="uiBtn" id="finish-quiz">Продолжить</button>
         </div>
 
         <audio preload="auto">
