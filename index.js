@@ -390,6 +390,16 @@ class View {
           </div>
           <button class="uiBtn" id="finish-quiz">Ок</button>
         </div>
+        
+        <audio preload="auto">
+          <source src="/assets/sounds/deafen.mp3" type="audio/mpeg">
+        </audio>
+        <audio preload="auto">
+          <source src="/assets/sounds/joined.mp3" type="audio/mpeg">
+        </audio>
+        <audio preload="auto">
+          <source src="/assets/sounds/t-notification.mp3" type="audio/mpeg">
+        </audio>
       </main>`;
     return content;
   }
@@ -439,6 +449,16 @@ class View {
           </div>
           <button class="uiBtn" id="finish-quiz">Ок</button>
         </div>
+
+        <audio preload="auto">
+          <source src="/assets/sounds/deafen.mp3" type="audio/mpeg">
+        </audio>
+        <audio preload="auto">
+          <source src="/assets/sounds/joined.mp3" type="audio/mpeg">
+        </audio>
+        <audio preload="auto">
+          <source src="/assets/sounds/t-notification.mp3" type="audio/mpeg">
+        </audio>
       </main>`;
     return content;
   }
@@ -567,6 +587,9 @@ class AppController {
     this.quiz.generateNewQuiz(groupIndex);
     // Create page basic layout
     const pageNode = this.view.createQuizAPage(this.settings);
+    // Update sounds
+    this.mutePage(pageNode, !this.settings.options.soundsEnabled);
+    this.changePageVolume(pageNode, this.settings.options.volume);
     // Add page events
     const btnBack = pageNode.querySelector("#back-btn");
     btnBack.addEventListener("click", this.getAGroupsPage);
@@ -582,10 +605,14 @@ class AppController {
           // Add success badge to the painting
           document.querySelector(".resultBadge").classList.remove("failBadge");
           document.querySelector(".resultBadge").classList.add("successBadge");
+          // Play sound
+          this.playSound(1);
         } else {
           // Add fail badge to the painting
           document.querySelector(".resultBadge").classList.remove("successBadge");
           document.querySelector(".resultBadge").classList.add("failBadge");
+          // Play sound
+          this.playSound(0);
         }
         // Show task answer popup
         document.querySelector(".overlay").classList.remove("hidden");
@@ -602,6 +629,8 @@ class AppController {
       // Check Quiz end condition
       if (this.quiz.currentTask > 9) {
         // Invoke Quiz results
+        // Quiz end sound
+        this.playSound(2);
         // Progress bar update --------------------------------------------- function
         let progress = "";
         this.quiz.quizProgress.forEach((i) => {
@@ -693,6 +722,9 @@ class AppController {
     this.quiz.generateNewQuiz(groupIndex);
     // Create page basic layout
     const pageNode = this.view.createQuizPPage(this.settings);
+    // Update sounds
+    this.mutePage(pageNode, !this.settings.options.soundsEnabled);
+    this.changePageVolume(pageNode, this.settings.options.volume);
     // Add page events
     const btnBack = pageNode.querySelector("#back-btn");
     btnBack.addEventListener("click", this.getPGroupsPage);
@@ -707,10 +739,14 @@ class AppController {
           // Add success badge to the painting
           document.querySelector(".resultBadge").classList.remove("failBadge");
           document.querySelector(".resultBadge").classList.add("successBadge");
+          // Play sound
+          this.playSound(1);
         } else {
           // Add fail badge to the painting
           document.querySelector(".resultBadge").classList.remove("successBadge");
           document.querySelector(".resultBadge").classList.add("failBadge");
+          // Play sound
+          this.playSound(0);
         }
         // Show task answer popup
         document.querySelector(".overlay").classList.remove("hidden");
@@ -726,6 +762,8 @@ class AppController {
       // Check Quiz end condition
       if (this.quiz.currentTask > 9) {
         // Invoke Quiz results
+        // Quiz end sound
+        this.playSound(2);
         // Progress bar update --------------------------------------------- function
         let progress = "";
         this.quiz.quizProgress.forEach((i) => {
@@ -873,8 +911,8 @@ class AppController {
 
   // Sounds
   playSound(i) {
-    // "click"  -> 0
-    // "snap"   -> 1
+    // "click" "deafen"  -> 0
+    // "snap"  "joined"  -> 1
     const sounds = document.getElementsByTagName("audio");
     sounds[i].currentTime = 0;
     sounds[i].play();
