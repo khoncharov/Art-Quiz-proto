@@ -157,18 +157,8 @@ export class AppController {
         // Invoke Quiz results
         // Quiz end sound
         this.playSound(2);
-        // Progress bar update --------------------------------------------- function
-        let progress = "";
-        this.quiz.quizProgress.forEach((i) => {
-          if (i === -1) {
-            progress += `<span class="bullet"></span>`;
-          } else if (i === 0) {
-            progress += `<span class="bullet wrongAnswer"></span>`;
-          } else if (i === 1) {
-            progress += `<span class="bullet rightAnswer"></span>`;
-          }
-        });
-        document.querySelector(".progressBar").innerHTML = progress;
+        // Progress bar update
+        this.updateProgressBar(document);
         // - Comtpute quiz result
         const quizResult = this.quiz.quizProgress.reduce(
           (acc, i) => (i === 1 ? acc + i : acc),
@@ -201,6 +191,20 @@ export class AppController {
     this.render(pageNode);
   };
 
+  updateProgressBar = (pageNode) => {
+    let progress = "";
+    this.quiz.quizProgress.forEach((i) => {
+      if (i === -1) {
+        progress += `<span class="bullet"></span>`;
+      } else if (i === 0) {
+        progress += `<span class="bullet wrongAnswer"></span>`;
+      } else if (i === 1) {
+        progress += `<span class="bullet rightAnswer"></span>`;
+      }
+    });
+    pageNode.querySelector(".progressBar").innerHTML = progress;
+  };
+
   showTaskAnswerCard = (userGuess) => {
     const isRightAnswer = this.quiz.checkUserGuess(this.quiz.currentTask, userGuess);
     if (isRightAnswer) {
@@ -225,17 +229,7 @@ export class AppController {
     // Current task number
     node.querySelector(".taskCounter").textContent = this.quiz.currentTask + 1;
     // Progress bar update
-    let progress = "";
-    this.quiz.quizProgress.forEach((i) => {
-      if (i === -1) {
-        progress += `<span class="bullet"></span>`;
-      } else if (i === 0) {
-        progress += `<span class="bullet wrongAnswer"></span>`;
-      } else if (i === 1) {
-        progress += `<span class="bullet rightAnswer"></span>`;
-      }
-    });
-    node.querySelector(".progressBar").innerHTML = progress;
+    this.updateProgressBar(node);
     // Task Question
     node.querySelector(".taskQuestion").innerHTML = this.quiz.getTaskQuestion(
       this.quiz.currentTask
@@ -300,17 +294,7 @@ export class AppController {
         // Quiz end sound
         this.playSound(2);
         // Progress bar update --------------------------------------------- function
-        let progress = "";
-        this.quiz.quizProgress.forEach((i) => {
-          if (i === -1) {
-            progress += `<span class="bullet"></span>`;
-          } else if (i === 0) {
-            progress += `<span class="bullet wrongAnswer"></span>`;
-          } else if (i === 1) {
-            progress += `<span class="bullet rightAnswer"></span>`;
-          }
-        });
-        document.querySelector(".progressBar").innerHTML = progress;
+        this.updateProgressBar(document);
         // - Comtpute quiz result
         const quizResult = this.quiz.quizProgress.reduce(
           (acc, i) => (i === 1 ? acc + i : acc),
@@ -347,17 +331,7 @@ export class AppController {
     // Current task number
     node.querySelector(".taskCounter").textContent = this.quiz.currentTask + 1;
     // Progress bar update
-    let progress = "";
-    this.quiz.quizProgress.forEach((i) => {
-      if (i === -1) {
-        progress += `<span class="bullet"></span>`;
-      } else if (i === 0) {
-        progress += `<span class="bullet wrongAnswer"></span>`;
-      } else if (i === 1) {
-        progress += `<span class="bullet rightAnswer"></span>`;
-      }
-    });
-    node.querySelector(".progressBar").innerHTML = progress;
+    this.updateProgressBar(node);
     // Task Painting
     const taskImg = this.quiz.getTaskImg(this.quiz.currentTask);
     node.querySelector(".taskImg").src = taskImg;
