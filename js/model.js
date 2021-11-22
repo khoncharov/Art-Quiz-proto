@@ -16,13 +16,9 @@ export class QuizFactory {
 }
 
 class Task {
-  constructor(taskInfo) {
+  constructor(taskInfo, options) {
     this.data = taskInfo;
-    this.options = this.generateTaskOptions(); // <Array> of "image" index
-  }
-
-  getTaskID() {
-    return +this.data.imageNum;
+    this.options = options;
   }
 
   getAuthor() {
@@ -44,25 +40,6 @@ class Task {
   getOptions() {
     return this.options;
   }
-
-  shuffle(arr) {
-    for (let i = arr.length - 1; i > 0; i--) {
-      let j = Math.floor(Math.random() * (i + 1));
-      [arr[i], arr[j]] = [arr[j], arr[i]];
-    }
-  }
-
-  generateTaskOptions() {
-    const arr = [this.getTaskID()];
-    while (arr.length < 4) {
-      const num = Math.floor(Math.random() * 241);
-      if (!arr.includes(num)) {
-        arr.push(num);
-      }
-    }
-    this.shuffle(arr);
-    return arr;
-  }
 }
 
 class Quiz {
@@ -71,6 +48,38 @@ class Quiz {
     this.data = data;
     this.quizProgress = null;
     this.currentTask = 0;
+  }
+
+  getNewQuiz(group, category) {
+    const tasks = [];
+    for (let i = 0; i < 10; i++) {
+      const index = this.getTaskRecordIndex(i, group, category);
+      const taskRec = this.data.image[index];
+      const taskOptions = this.generateTaskOptions(taskRec);
+      tasks.push(new Task(taskRec, taskOptions));
+    }
+    this.tasks = {
+      task: tasks,
+    };
+    this.resetProgress();
+  }
+
+  generateTaskOptions(taskRec) {
+    // taskRec -> task record index in db
+    const taskId = +taskRec.imageNum;
+    const options = [taskId];
+    while (options.length < 4) {
+      const num = Math.floor(Math.random() * 241);
+      const isNewValue = (i) => !options.includes(i);
+      const isNewAuthor = (i) => {
+        return this.data.image[taskId].author !== this.data.image[i].author;
+      };
+      if (isNewValue(num) && isNewAuthor(num)) {
+        options.push(num);
+      }
+    }
+    shuffle(options);
+    return options;
   }
 
   resetProgress() {
@@ -96,6 +105,16 @@ class Quiz {
       return `./assets/pic/img/${index}.webp`;
     }
   }
+
+  getTaskRecordIndex = (taskIndex, groupIndex, categoryIndex) => {
+    const tasksPerGroup = 10;
+    const groupsPerCategory = 12;
+    return (
+      taskIndex +
+      groupIndex * tasksPerGroup +
+      categoryIndex * groupsPerCategory * tasksPerGroup
+    );
+  };
 }
 
 class ArtistsQuiz extends Quiz {
@@ -104,15 +123,7 @@ class ArtistsQuiz extends Quiz {
   }
 
   generateNewQuiz(group) {
-    const tasks = [];
-    for (let i = 0; i < 10; i++) {
-      const taskInfo = this.data.image[i + group * 10];
-      tasks.push(new Task(taskInfo));
-    }
-    this.tasks = {
-      task: tasks,
-    };
-    this.resetProgress();
+    this.getNewQuiz(group, 0);
   }
 
   getTaskQuestion(index) {
@@ -134,15 +145,7 @@ class PaintingsQuiz extends Quiz {
   }
 
   generateNewQuiz(group) {
-    const tasks = [];
-    for (let i = 0; i < 10; i++) {
-      const taskInfo = this.data.image[i + group * 10 + 120];
-      tasks.push(new Task(taskInfo));
-    }
-    this.tasks = {
-      task: tasks,
-    };
-    this.resetProgress();
+    this.getNewQuiz(group, 1);
   }
 
   getTaskQuestion() {
@@ -208,5 +211,14 @@ export class AppSettings {
   set options(value) {
     this._options = value;
     localStorage.setItem("options", JSON.stringify(value));
+  }
+}
+
+// Functions
+
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    let j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
   }
 }
