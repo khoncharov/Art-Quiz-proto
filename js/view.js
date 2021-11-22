@@ -104,7 +104,8 @@ export class View {
     return content;
   }
 
-  createGroupsPage() {
+  createGroupsPage(type) {
+    // Cards list
     let groupList = "";
     for (let i = 0; i < 12; i++) {
       const groupNum = i + 1;
@@ -116,14 +117,21 @@ export class View {
           </div>
         </li>`;
     }
+    // Group caption
+    let groupCaption;
+    if (type === "artists") {
+      groupCaption = "Художники";
+    } else if (type === "paintings") {
+      groupCaption = "Картины";
+    }
     const content = document.createElement("div");
     content.id = "quiz-groups-page";
     content.innerHTML = `
       <header>               
         <nav class="navBar">
           <button class="uiBtn" id="home-page-btn">Назад</button>          
-          <h2 class="pageCaption">Группы</h2>
-          <button class="uiBtn">Счёт</button>  
+          <h2 class="pageCaption">${groupCaption}</h2>
+          <button class="uiBtn hidden">Счёт</button>  
         </nav>
       </header>
       <main>

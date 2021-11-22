@@ -10,6 +10,7 @@ export class AppController {
     this.view = new View();
     this.quizFactory = null;
     this.quiz = null;
+    this.taskTimer = null;
     this.settings = new AppSettings();
     this.results = new QuizResults();
   }
@@ -134,12 +135,17 @@ export class AppController {
     const btnBack = pageNode.querySelector("#back-btn");
     btnBack.addEventListener("click", () => {
       this.getGroupsPage("artists");
+      // Remove task timeout timer
+      this.removeTaskTimer();
     });
     //
     // - Task option img click event
     for (let i = 0; i < 4; i++) {
       const container = `#option-img-${i}`;
       pageNode.querySelector(container).addEventListener("click", (e) => {
+        // Remove task timeout timer
+        this.removeTaskTimer();
+        // Check Task answer
         const userGuess = e.target.id;
         this.showTaskAnswerCard(userGuess);
       });
@@ -253,6 +259,9 @@ export class AppController {
     node.querySelector(
       ".paintingAthor"
     ).textContent = `${paintingAuthor}, ${paintingYear}`;
+    //
+    // Task timer
+    this.addTaskTimer();
   }
 
   // Paintings quiz page controller
@@ -273,12 +282,16 @@ export class AppController {
     const btnBack = pageNode.querySelector("#back-btn");
     btnBack.addEventListener("click", () => {
       this.getGroupsPage("paintings");
+      // Remove task timeout timer
+      this.removeTaskTimer();
     });
     //
     // - Task option img click event
     for (let i = 0; i < 4; i++) {
       const container = `#option-btn-${i}`;
       pageNode.querySelector(container).addEventListener("click", (e) => {
+        // Remove task timeout timer
+        this.removeTaskTimer();
         // Check Task answer
         const userGuess = e.target.data;
         this.showTaskAnswerCard(userGuess);
@@ -359,6 +372,9 @@ export class AppController {
     node.querySelector(
       ".paintingAthor"
     ).textContent = `${paintingAuthor}, ${paintingYear}`;
+    //
+    // Task timer
+    this.addTaskTimer();
   }
 
   getSettingsPage = () => {
@@ -420,6 +436,7 @@ export class AppController {
         timeLimitEnabled: document.querySelector("#time-limit-enabled").checked,
         timeLimit: document.querySelector("#time-limit").value,
       };
+      this.getHomePage();
     });
     //
     // - Return default settings btn click event
@@ -454,4 +471,33 @@ export class AppController {
       item.volume = level;
     }
   }
+
+  // Timer
+  addTaskTimer = () => {
+    if (this.settings.options.timeLimitEnabled) {
+      // Initial time
+      const timeStamp = Date.now();
+      // Timer id
+      this.taskTimer = setTimeout(this.taskTimeoutHandler, 100, timeStamp);
+    }
+  };
+
+  removeTaskTimer = () => {
+    if (this.settings.options.timeLimitEnabled) {
+      clearTimeout(this.taskTimer);
+    }
+  };
+
+  taskTimeoutHandler = (initialTime) => {
+    const timeLim = +this.settings.options.timeLimit * 1000;
+    const currentTime = Date.now();
+    if (currentTime - initialTime >= timeLim) {
+      const userGuess = "-1";
+      this.showTaskAnswerCard(userGuess);
+    } else {
+      const timeLeft = Math.round((timeLim - currentTime + initialTime) / 1000);
+      document.querySelector(".timer").textContent = timeLeft;
+      this.taskTimer = setTimeout(this.taskTimeoutHandler, 100, initialTime);
+    }
+  };
 }

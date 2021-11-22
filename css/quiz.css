@@ -203,6 +203,7 @@ button {
   margin-left: 10px;
   border: none;
   text-align: center;
+  outline: none;
 }
 
 .settingsControls-container {

@@ -196,9 +196,9 @@ export class AppSettings {
   constructor() {
     this._options = JSON.parse(localStorage.getItem("options")) ?? {
       soundsEnabled: false,
-      volume: 1, // 0 - 1
+      volume: "1", // 0 - 1
       timeLimitEnabled: false,
-      timeLimit: 30, // [5 - 30] step 5 seconds
+      timeLimit: "30", // [5 - 30] step 5 seconds
     };
   }
 
